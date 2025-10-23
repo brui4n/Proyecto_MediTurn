@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.coronel.mediturn"
+    namespace = "com.tecsup.mediturn"
     compileSdk = 36
 
     defaultConfig {

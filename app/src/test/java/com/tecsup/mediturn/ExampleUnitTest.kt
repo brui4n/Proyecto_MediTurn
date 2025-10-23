@@ -1,4 +1,4 @@
-package com.coronel.mediturn
+package com.tecsup.mediturn
 
 import org.junit.Test
 

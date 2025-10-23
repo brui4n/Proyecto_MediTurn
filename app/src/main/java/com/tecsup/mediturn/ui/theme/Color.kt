@@ -1,4 +1,4 @@
-package com.coronel.mediturn.ui.theme
+package com.tecsup.mediturn.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -1,4 +1,4 @@
-package com.coronel.mediturn.presentation
+package com.tecsup.mediturn.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.coronel.mediturn.ui.theme.MediTurnTheme
+import com.tecsup.mediturn.ui.theme.MediTurnTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

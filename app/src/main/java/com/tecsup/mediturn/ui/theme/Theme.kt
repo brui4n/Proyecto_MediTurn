@@ -1,6 +1,5 @@
-package com.coronel.mediturn.ui.theme
+package com.tecsup.mediturn.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
