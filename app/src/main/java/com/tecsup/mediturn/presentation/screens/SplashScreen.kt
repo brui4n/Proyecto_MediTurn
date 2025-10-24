@@ -1,102 +1,135 @@
 package com.tecsup.mediturn.presentation.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.mediturn.navigation.Routes
+import com.tecsup.mediturn.ui.theme.*   // 👈 importa tu paleta personalizada
+import kotlinx.coroutines.delay
+
+@Composable
+fun MediTurnLogo() {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = Modifier
+            .width(160.dp)
+            .height(100.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "🩺",
+                fontSize = 45.sp,
+                color = BluePrimary   // 💙 Usamos el color definido en Color.kt
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = "💚",
+                fontSize = 40.sp,
+                color = GreenAccent   // 💚 Usamos el verde personalizado
+            )
+        }
+    }
+}
 
 @Composable
 fun SplashScreen(navController: NavController) {
+    var activeDot by remember { mutableStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        repeat(3) { index ->
+            activeDot = index
+            delay(1000L)
+        }
+        navController.popBackStack()
+        navController.navigate(Routes.Login.route)
+    }
+
+    val gradientBrush = Brush.verticalGradient(colors = BackgroundGradient)
+
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0D47A1)), // Azul de fondo
+            .background(gradientBrush),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.padding(24.dp)
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 64.dp)
         ) {
-            // Ícono tipo corazón (emoji o ícono personalizado)
-            Text(
-                text = "💙",
-                fontSize = 64.sp
-            )
-
             Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Bienvenido",
-                color = Color.White,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-
-            Text(
-                text = "Inicia sesión en MediTurn",
-                color = Color(0xFFBBDEFB),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Tarjeta con botones
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF102B5F))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                MediTurnLogo()
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = "MediTurn",
+                    color = WhiteText,
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Tu salud, nuestra prioridad",
+                    color = WhiteTransparent,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                )
+            }
 
-                    Button(
-                        onClick = { navController.navigate(Routes.Login.route) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1976D2)),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Iniciar sesión", fontSize = 16.sp)
-                    }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    OutlinedButton(
-                        onClick = { navController.navigate(Routes.Register.route) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.White
-                        ),
-                        border = ButtonDefaults.outlinedButtonBorder.copy(
-                            width = 1.dp,
-                            brush = SolidColor(Color(0xFF42A5F5))
-                        )
-                    ) {
-                        Text("Registrarse", fontSize = 16.sp)
-                    }
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(3) { index ->
+                    DotIndicator(isActive = index == activeDot)
+                    if (index < 2) Spacer(modifier = Modifier.width(10.dp))
                 }
             }
         }
     }
+}
+
+@Composable
+fun DotIndicator(isActive: Boolean) {
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (isActive) 1f else 0.3f,
+        animationSpec = tween(durationMillis = 300)
+    )
+
+    Box(
+        modifier = Modifier
+            .size(10.dp)
+            .background(
+                color = WhiteText.copy(alpha = animatedAlpha),
+                shape = RoundedCornerShape(50)
+            )
+    )
 }
