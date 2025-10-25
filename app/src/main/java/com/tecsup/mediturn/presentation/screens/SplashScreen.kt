@@ -1,61 +1,135 @@
 package com.tecsup.mediturn.presentation.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.mediturn.navigation.Routes
+import com.tecsup.mediturn.ui.theme.*
+import kotlinx.coroutines.delay
 
-/**
- * Pantalla Splash: muestra el logo o nombre de MediTurn mientras carga la app.
- * Puede usarse para inicializar datos o redirigir al usuario según su sesión.
- */
+@Composable
+fun MediTurnLogo() {
+    Card(
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = Modifier
+            .width(160.dp)
+            .height(100.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "🩺",
+                fontSize = 45.sp,
+                color = BluePrimary
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Text(
+                text = "💚",
+                fontSize = 40.sp,
+                color = GreenAccent
+            )
+        }
+    }
+}
+
 @Composable
 fun SplashScreen(navController: NavController) {
+    var activeDot by remember { mutableStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        repeat(3) { index ->
+            activeDot = index
+            delay(1000L)
+        }
+        navController.popBackStack()
+        navController.navigate(Routes.Login.route)
+    }
+
+    val gradientBrush = Brush.verticalGradient(colors = BackgroundGradient)
+
     Box(
-        modifier=Modifier
+        modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .background(gradientBrush),
         contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 64.dp)
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "MediTurn",
-                fontSize = 32.sp
-            )
-            Spacer(modifier=Modifier.height(16.dp))
-
-            Button(
-                onClick = { navController.navigate(Routes.Register.route) },
-                modifier = Modifier
-                    .fillMaxWidth()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Text("Registrarse")
+                MediTurnLogo()
+                Spacer(modifier = Modifier.height(24.dp))
+                Text(
+                    text = "MediTurn",
+                    color = WhiteText,
+                    fontSize = 34.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Tu salud, nuestra prioridad",
+                    color = WhiteTransparent,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center
+                )
             }
 
-            Spacer(modifier=Modifier.height(16.dp))
-
-            Button(
-                onClick = { navController.navigate(Routes.Login.route) },
-                modifier = Modifier
-                    .fillMaxWidth()
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Iniciar sesion")
+                repeat(3) { index ->
+                    DotIndicator(isActive = index == activeDot)
+                    if (index < 2) Spacer(modifier = Modifier.width(10.dp))
+                }
             }
         }
     }
 }
 
+@Composable
+fun DotIndicator(isActive: Boolean) {
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (isActive) 1f else 0.3f,
+        animationSpec = tween(durationMillis = 300)
+    )
+
+    Box(
+        modifier = Modifier
+            .size(10.dp)
+            .background(
+                color = WhiteText.copy(alpha = animatedAlpha),
+                shape = RoundedCornerShape(50)
+            )
+    )
+}
