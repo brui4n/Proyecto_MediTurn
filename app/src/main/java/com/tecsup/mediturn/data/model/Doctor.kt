@@ -1,10 +1,10 @@
 package com.tecsup.mediturn.data.model
 
-class Doctor (
+data class Doctor (
     val id: Int,
     val name: String,
-    val speciality: String,
+    val specialty: String,
     val experience: Int,
     val rating: Double,
-    val imageURL: String
+    val imageUrl: String
 )

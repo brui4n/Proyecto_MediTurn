@@ -1,6 +1,6 @@
 package com.tecsup.mediturn.data.model
 
-class Appointment (
+data class Appointment (
     val id: Int,
     val doctor: Doctor,
     val patient: Patient,

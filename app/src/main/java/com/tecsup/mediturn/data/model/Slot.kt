@@ -1,6 +1,6 @@
 package com.tecsup.mediturn.data.model
 
-class Slot (
+data class Slot (
     val id: Int,
     val doctorId: Int,
     val date: String,
