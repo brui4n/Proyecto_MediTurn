@@ -61,4 +61,3 @@ val BackgroundGradient = listOf(BluePrimary, GreenAccent.copy(alpha = 0.8f))
 - ✅ SplashScreen implementada con animaciones.
 - ✅ Paleta de colores aplicada globalmente.
 - ✅ Integración visual alineada con Figma.
-- ✅ Navegación automática al Login funcional.
