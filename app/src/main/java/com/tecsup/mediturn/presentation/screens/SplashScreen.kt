@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.mediturn.navigation.Routes
-import com.tecsup.mediturn.ui.theme.*   // 👈 importa tu paleta personalizada
+import com.tecsup.mediturn.ui.theme.*
 import kotlinx.coroutines.delay
 
 @Composable
@@ -40,13 +40,13 @@ fun MediTurnLogo() {
             Text(
                 text = "🩺",
                 fontSize = 45.sp,
-                color = BluePrimary   // 💙 Usamos el color definido en Color.kt
+                color = BluePrimary
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "💚",
                 fontSize = 40.sp,
-                color = GreenAccent   // 💚 Usamos el verde personalizado
+                color = GreenAccent
             )
         }
     }

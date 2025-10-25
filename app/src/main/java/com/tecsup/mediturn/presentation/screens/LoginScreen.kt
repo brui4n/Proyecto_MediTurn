@@ -31,7 +31,6 @@ fun LoginScreen(navController: NavController) {
             .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 🔷 Sección superior con degradado
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -65,7 +64,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 🧾 Campos de texto
+        // Campos de texto
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -91,7 +90,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // 🔵 Botón principal
+        //Botón principal
         Button(
             onClick = { navController.navigate(Routes.Home.route) },
             colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
