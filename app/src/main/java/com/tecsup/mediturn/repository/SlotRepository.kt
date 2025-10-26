@@ -6,10 +6,6 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Archivo: SlotRepository.kt
  * Descripción: Repositorio local simulado que maneja los slots (horarios) de los doctores.
- *
- * Autor: Bryan Coronel
- * Proyecto: MediTurn
- * Fecha: Octubre 2025
  */
 class SlotRepository {
 

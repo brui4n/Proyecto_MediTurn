@@ -12,9 +12,6 @@ import java.util.concurrent.atomic.AtomicInteger
  *              Este repo usa internamente Doctor/Patient/Slot como objetos completos
  *              (en un escenario real se linkearían por id o mediante una BD).
  *
- * Autor: Bryan Coronel
- * Proyecto: MediTurn
- * Fecha: Octubre 2025
  */
 class AppointmentRepository(
     // Inyectar repositorios locales para poder resolver doctor/slot/patient

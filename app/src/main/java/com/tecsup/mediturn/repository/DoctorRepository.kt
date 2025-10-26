@@ -6,9 +6,6 @@ import com.tecsup.mediturn.data.model.Doctor
  * Archivo: DoctorRepository.kt
  * Descripción: Repositorio local simulado para doctores.
  *
- * Autor: Bryan Coronel
- * Proyecto: MediTurn
- * Fecha: Octubre 2025
  */
 class DoctorRepository {
 
