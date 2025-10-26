@@ -14,4 +14,6 @@ sealed class Routes (val route: String){
     object Home : Routes("home")
     object Citas : Routes("citas")
     object Perfil : Routes("perfil")
+    object DoctorList : Routes("doctor_list")
+
 }
