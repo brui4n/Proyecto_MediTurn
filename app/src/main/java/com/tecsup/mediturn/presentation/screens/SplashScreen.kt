@@ -17,7 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.mediturn.navigation.Routes
-import com.tecsup.mediturn.ui.theme.*   // 👈 importa tu paleta personalizada
+import com.tecsup.mediturn.ui.theme.*
+import com.tecsup.mediturn.viewmodel.SplashViewModel
 import kotlinx.coroutines.delay
 
 @Composable
@@ -40,33 +41,38 @@ fun MediTurnLogo() {
             Text(
                 text = "🩺",
                 fontSize = 45.sp,
-                color = BluePrimary   // 💙 Usamos el color definido en Color.kt
+                color = BluePrimary
             )
             Spacer(modifier = Modifier.width(10.dp))
             Text(
                 text = "💚",
                 fontSize = 40.sp,
-                color = GreenAccent   // 💚 Usamos el verde personalizado
+                color = GreenAccent
             )
         }
     }
 }
 
 @Composable
-fun SplashScreen(navController: NavController) {
-    var activeDot by remember { mutableStateOf(0) }
-
-    LaunchedEffect(Unit) {
-        repeat(3) { index ->
-            activeDot = index
-            delay(1000L)
-        }
-        navController.popBackStack()
-        navController.navigate(Routes.Login.route)
-    }
+fun SplashScreen(navController: NavController, viewModel: SplashViewModel) {
+    val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsState()
 
     val gradientBrush = Brush.verticalGradient(colors = BackgroundGradient)
 
+    // Efecto para navegar cuando tengamos el estado listo
+    LaunchedEffect(isUserLoggedIn) {
+        if (isUserLoggedIn != null) {
+            delay(2000L)
+            navController.popBackStack()
+            if (isUserLoggedIn == true) {
+                navController.navigate(Routes.Home.route)
+            } else {
+                navController.navigate(Routes.Login.route)
+            }
+        }
+    }
+
+    // Pantalla visual (tu mismo diseño)
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -109,7 +115,7 @@ fun SplashScreen(navController: NavController) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 repeat(3) { index ->
-                    DotIndicator(isActive = index == activeDot)
+                    DotIndicator(isActive = index == 1)
                     if (index < 2) Spacer(modifier = Modifier.width(10.dp))
                 }
             }
