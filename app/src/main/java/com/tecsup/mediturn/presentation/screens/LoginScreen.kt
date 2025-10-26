@@ -44,7 +44,7 @@ fun LoginScreen(navController: NavController) {
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                MediTurnLogo() // ♻️ Reutiliza el logo del splash
+                MediTurnLogo()
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
                     text = "Bienvenido a MediTurn",

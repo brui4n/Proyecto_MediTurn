@@ -13,10 +13,14 @@ import com.tecsup.mediturn.data.model.Patient
 class PatientRepository {
 
     private val patients = mutableListOf(
-        Patient(id = 1, name = "Bryan Coronel", age = 24, gender = "M", email = "bryan@example.com", phone = "987654321"),
-        Patient(id = 2, name = "Milene Fuentes", age = 22, gender = "F", email = "milene@example.com", phone = "987654322"),
-        Patient(id = 3, name = "Santiago Salas", age = 25, gender = "M", email = "santiago@example.com", phone = "987654323")
+        Patient(id = 1, name = "Bryan Coronel", age = 24, gender = "M", email = "bryan@example.com", phone = "987654321", "1234"),
+        Patient(id = 2, name = "Milene Fuentes", age = 22, gender = "F", email = "milene@example.com", phone = "987654322", "abcd"),
+        Patient(id = 3, name = "Santiago Salas", age = 25, gender = "M", email = "santiago@example.com", phone = "987654323", "qwerty")
     )
+
+    fun login(email: String, password: String): Patient? {
+        return patients.find { it.email == email && it.password == password }
+    }
 
     fun getAllPatients(): List<Patient> = patients.toList()
 
