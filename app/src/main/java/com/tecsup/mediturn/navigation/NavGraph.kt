@@ -17,6 +17,11 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.tecsup.mediturn.repository.DoctorRepository
 import com.tecsup.mediturn.presentation.screens.DoctorDetailScreen
+import com.tecsup.mediturn.presentation.screens.AppointmentScreen
+import com.tecsup.mediturn.presentation.screens.CitasScreen
+import com.tecsup.mediturn.presentation.screens.PaymentScreen
+import com.tecsup.mediturn.presentation.screens.PaymentSummaryScreen
+import com.tecsup.mediturn.presentation.screens.PerfilScreen
 
 
 /**
@@ -44,6 +49,10 @@ fun NavGraph() {
         composable(Routes.Login.route) { LoginScreen(navController) }
         composable(Routes.Register.route) { RegisterScreen(navController) }
         composable(Routes.Home.route) { HomeScreen(navController) }
+        composable(Routes.Citas.route) { CitasScreen(navController) }
+        composable(Routes.Perfil.route) { PerfilScreen(navController) }
+
+
         composable(
             route = Routes.DoctorList.route + "/{specialty}",
             arguments = listOf(navArgument("specialty") { type = NavType.StringType })
@@ -63,6 +72,12 @@ fun NavGraph() {
                 DoctorDetailScreen(navController = navController, doctor = it)
             }
         }
+        composable("appointment") {
+            AppointmentScreen(navController)
+        }
+        composable(Routes.Payment.route) { PaymentScreen(navController) }
+        composable(Routes.PaymentSummary.route) { PaymentSummaryScreen(navController) }
+
 
 
     }
