@@ -7,11 +7,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.tecsup.mediturn.data.session.SessionManager
+import com.tecsup.mediturn.presentation.screens.DoctorListScreen
 import com.tecsup.mediturn.presentation.screens.HomeScreen
 import com.tecsup.mediturn.presentation.screens.LoginScreen
 import com.tecsup.mediturn.presentation.screens.RegisterScreen
 import com.tecsup.mediturn.presentation.screens.SplashScreen
 import com.tecsup.mediturn.viewmodel.SplashViewModel
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.tecsup.mediturn.repository.DoctorRepository
+import com.tecsup.mediturn.presentation.screens.DoctorDetailScreen
+import com.tecsup.mediturn.presentation.screens.AppointmentScreen
+import com.tecsup.mediturn.presentation.screens.CitasScreen
+import com.tecsup.mediturn.presentation.screens.PaymentScreen
+import com.tecsup.mediturn.presentation.screens.PaymentSummaryScreen
+import com.tecsup.mediturn.presentation.screens.PerfilScreen
+
 
 /**
  * Archivo: NavGraph.kt
@@ -38,6 +49,36 @@ fun NavGraph() {
         composable(Routes.Login.route) { LoginScreen(navController) }
         composable(Routes.Register.route) { RegisterScreen(navController) }
         composable(Routes.Home.route) { HomeScreen(navController) }
+        composable(Routes.Citas.route) { CitasScreen(navController) }
+        composable(Routes.Perfil.route) { PerfilScreen(navController) }
+
+
+        composable(
+            route = Routes.DoctorList.route + "/{specialty}",
+            arguments = listOf(navArgument("specialty") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val specialty = backStackEntry.arguments?.getString("specialty") ?: ""
+            DoctorListScreen(navController, specialty)
+        }
+        composable(
+            route = "doctor_detail/{doctorId}",
+            arguments = listOf(navArgument("doctorId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getInt("doctorId") ?: 0
+            val repository = DoctorRepository()
+            val doctor = repository.getDoctorById(doctorId)
+
+            doctor?.let {
+                DoctorDetailScreen(navController = navController, doctor = it)
+            }
+        }
+        composable("appointment") {
+            AppointmentScreen(navController)
+        }
+        composable(Routes.Payment.route) { PaymentScreen(navController) }
+        composable(Routes.PaymentSummary.route) { PaymentSummaryScreen(navController) }
+
+
 
     }
 }

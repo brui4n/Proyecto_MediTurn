@@ -50,6 +50,14 @@ class DoctorRepository {
             experience = 4,
             rating = 4.0,
             imageUrl = ""
+        ),
+        Doctor(
+            id = 6,
+            name = "Dr. Sara Ferro",
+            specialty = "Cardiología",
+            experience = 10,
+            rating = 4.7,
+            imageUrl = ""
         )
     )
 
