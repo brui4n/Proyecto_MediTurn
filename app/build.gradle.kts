@@ -14,7 +14,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -41,10 +40,27 @@ android {
 
 dependencies {
 
-    implementation("androidx.datastore:datastore-preferences:1.1.1")
-    implementation("androidx.navigation:navigation-compose:2.9.5")
+    // Retrofit y convertidor Gson
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    // Interceptor para logs de red (útil para debug)
+    implementation("com.squareup.okhttp3:logging-interceptor:5.0.0-alpha.11")
+
+    // Corrutinas (ya las tienes, pero las dejamos por claridad)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // DataStore para guardar sesión/token
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
+    // Navegación Compose
+    implementation("androidx.navigation:navigation-compose:2.9.5")
+
+    // Coil (imágenes)
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // Librerías base de Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -55,6 +71,10 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.foundation)
+    implementation("androidx.compose.material:material-icons-extended")
+
+    // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
