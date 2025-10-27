@@ -5,7 +5,7 @@ class Doctor(models.Model):
     specialty = models.CharField(max_length=100)
     experience = models.IntegerField()
     rating = models.FloatField()
-    image_url = models.URLField(blank=True, null=True)
+    image = models.ImageField(upload_to='doctors/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} - {self.specialty}"
