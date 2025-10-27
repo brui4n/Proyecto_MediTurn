@@ -16,10 +16,10 @@ import com.tecsup.mediturn.navigation.Routes
 fun BottomBar(
     navController: NavController,
     currentRoute: String,
-    modifier: Modifier = Modifier // 👈 lo agregamos aquí
+    modifier: Modifier = Modifier
 ) {
     NavigationBar(
-        modifier = modifier, // 👈 se aplica aquí
+        modifier = modifier,
         containerColor = Color.White
     ) {
         NavigationBarItem(

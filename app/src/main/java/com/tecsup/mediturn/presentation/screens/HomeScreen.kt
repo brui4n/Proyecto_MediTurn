@@ -1,6 +1,7 @@
 package com.tecsup.mediturn.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -261,6 +262,9 @@ fun HomeScreen(navController: NavController,
                             modifier = Modifier
                                 .height(90.dp)
                                 .fillMaxWidth()
+                                .clickable {
+                                    navController.navigate("${Routes.DoctorList.route}/$name")
+                                }
                         ) {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -288,9 +292,7 @@ fun HomeScreen(navController: NavController,
                         items(doctorsFiltered.size) { index ->
                             val doctor = doctorsFiltered[index]
                             DoctorCard(
-                                doctor = doctor,
-                                onClick = { /* navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}") */ }
-                            )
+                                doctor = doctor){}
                         }
                     }
                 }

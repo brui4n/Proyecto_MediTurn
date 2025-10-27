@@ -45,6 +45,8 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -55,7 +57,10 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.foundation)
     testImplementation(libs.junit)
+    implementation("androidx.compose.material:material-icons-extended")
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
