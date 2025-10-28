@@ -3,6 +3,7 @@ package com.tecsup.mediturn.presentation.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
@@ -15,22 +16,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.tecsup.mediturn.presentation.components.DoctorCard
-import com.tecsup.mediturn.repository.DoctorRepository
 import com.tecsup.mediturn.ui.theme.BluePrimary
 import com.tecsup.mediturn.ui.theme.GreenAccent
+import com.tecsup.mediturn.util.Resource
+import com.tecsup.mediturn.viewmodel.DoctorViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DoctorListScreen(navController: NavController, specialty: String) {
-    val repository = DoctorRepository()
+fun DoctorListScreen(
+    navController: NavController,
+    specialty: String,
+    viewModel: DoctorViewModel = viewModel()
+) {
     var searchQuery by remember { mutableStateOf("") }
 
-    // Lista filtrada
-    val doctors = remember(searchQuery) {
-        if (searchQuery.isBlank()) repository.findBySpecialty(specialty)
-        else repository.searchDoctorsByName(searchQuery)
+    // Observar el estado desde el ViewModel
+    val doctorState by viewModel.doctors.collectAsState()
+
+    // Cargar doctores por especialidad al inicio
+    LaunchedEffect(specialty) {
+        viewModel.loadDoctorsBySpecialty(specialty)
+    }
+
+    // Buscar doctores al escribir
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isNotBlank()) {
+            viewModel.searchDoctors(searchQuery)
+        } else {
+            viewModel.loadDoctorsBySpecialty(specialty)
+        }
     }
 
     Scaffold(
@@ -45,9 +62,7 @@ fun DoctorListScreen(navController: NavController, specialty: String) {
                     .padding(horizontal = 16.dp, vertical = 20.dp)
                     .statusBarsPadding()
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -66,7 +81,6 @@ fun DoctorListScreen(navController: NavController, specialty: String) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                // Campo de búsqueda
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
@@ -96,27 +110,50 @@ fun DoctorListScreen(navController: NavController, specialty: String) {
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = "${doctors.size} médicos encontrados",
-                color = Color.Gray,
-                fontSize = 14.sp
-            )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            when (doctorState) {
+                is Resource.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = BluePrimary)
+                    }
+                }
 
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(14.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(doctors.size) { index ->
-                    val doctor = doctors[index]
-                    DoctorCard(
-                        doctor = doctor,
-                        onDetailClick = {
-                            navController.navigate("doctor_detail/${doctor.id}")
-                            // navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
-                        }
+                is Resource.Success -> {
+                    val doctors = doctorState.data ?: emptyList()
+                    Text(
+                        text = "${doctors.size} médicos encontrados",
+                        color = Color.Gray,
+                        fontSize = 14.sp
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(14.dp),
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(doctors) { doctor ->
+                            DoctorCard(
+                                doctor = doctor,
+                                onDetailClick = {
+                                    navController.navigate("doctor_detail/${doctor.id}")
+                                }
+                            )
+                        }
+                    }
+                }
+
+                is Resource.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = doctorState.message ?: "Error al cargar médicos",
+                            color = Color.Red
+                        )
+                    }
                 }
             }
         }

@@ -18,30 +18,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.mediturn.navigation.Routes
-import com.tecsup.mediturn.repository.PatientRepository
 import com.tecsup.mediturn.ui.theme.*
-import com.tecsup.mediturn.viewmodel.RegisterViewModel
 
 @Composable
 fun RegisterScreen(
-    navController: NavController,
-    viewModel: RegisterViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    navController: NavController
 ) {
     var fullName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("Masculino") } // valor por defecto
+    var gender by remember { mutableStateOf("Masculino") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-
-    val errorMessage by viewModel.errorMessage.collectAsState()
-    val successMessage by viewModel.successMessage.collectAsState()
-    val isRegistered by viewModel.isRegistered.collectAsState()
-
-    // Redirección tras registro
-    LaunchedEffect(isRegistered) {
-        if (isRegistered) navController.navigate(Routes.Login.route)
-    }
 
     Column(
         modifier = Modifier
@@ -96,7 +84,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Campos de texto con mejor contraste
             val fieldColors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = GreenAccent,
                 focusedLabelColor = GreenAccent,
@@ -147,7 +134,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ⚧ Selección de género
             Text("Género", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             Row(
                 modifier = Modifier
@@ -196,25 +182,11 @@ fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // Mensajes de estado
-            errorMessage?.let {
-                Text(it, color = Color.Red, fontSize = 14.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            successMessage?.let {
-                Text(it, color = Color(0xFF4CAF50), fontSize = 14.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            // Botón principal
             Button(
                 onClick = {
-                    viewModel.registerPatient(
-                        fullName, email, phone, gender, password, confirmPassword
-                    )
+                    // TODO: Lógica de registro pendiente
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = GreenAccent),
                 shape = RoundedCornerShape(50),
