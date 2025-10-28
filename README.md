@@ -103,6 +103,6 @@ com.coronel.mediturn <br>
 ✅ Proyecto base creado en Android Studio  
 ✅ Estructura de paquetes organizada <br>
 ✅ Primer diseño en figma <br>
-🕓 Pendiente: primeras pantallas (Día 2–3)
+🕓 Pendiente: (Día 4-5)
 
 ---
