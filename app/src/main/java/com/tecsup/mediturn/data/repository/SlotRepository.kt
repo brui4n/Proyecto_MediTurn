@@ -1,15 +1,15 @@
 package com.tecsup.mediturn.data.repository
 
 import com.tecsup.mediturn.data.model.Slot
-import com.tecsup.mediturn.data.repository.RetrofitInstance
+import com.tecsup.mediturn.data.remote.SlotApi
 
-class SlotRepository {
+class SlotRepository(private val api: SlotApi) {
 
     suspend fun getSlots(): List<Slot> {
-        return RetrofitInstance.api.getSlots()
+        return api.getSlots()
     }
 
     suspend fun getSlotById(id: Int): Slot {
-        return RetrofitInstance.api.getSlot(id)
+        return api.getSlot(id)
     }
 }

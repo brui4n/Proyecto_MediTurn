@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MediTurnTheme {
-
+                NavGraph()
             }
         }
     }
@@ -27,5 +27,5 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-
+    NavGraph()
 }

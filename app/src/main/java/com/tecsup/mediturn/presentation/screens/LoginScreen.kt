@@ -22,181 +22,201 @@ import com.tecsup.mediturn.ui.theme.*
 import com.tecsup.mediturn.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, loginViewModel: LoginViewModel = viewModel()) {
+fun LoginScreen(
+    navController: NavController,
+    loginViewModel: LoginViewModel = viewModel()
+) {
 
     val email by loginViewModel.email
     val password by loginViewModel.password
     val errorMessage by loginViewModel.errorMessage
     val loggedInUser by loginViewModel.loggedInUser
+    val isLoading by loginViewModel.isLoading
 
-    // Si el usuario ya inició sesión, navegar al Home automáticamente
-    if (loggedInUser != null) {
-        LaunchedEffect(Unit) {
+    // 🔹 Efecto: si hay sesión cargada o login exitoso → ir al Home
+    LaunchedEffect(loggedInUser) {
+        if (loggedInUser != null) {
             navController.navigate(Routes.Home.route) {
                 popUpTo(Routes.Login.route) { inclusive = true }
             }
         }
     }
 
-    Column(
+    // 🔹 Efecto: cargar sesión previa al iniciar pantalla
+    LaunchedEffect(Unit) {
+        loginViewModel.loadSession()
+    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
-        horizontalAlignment = Alignment.CenterHorizontally
+        contentAlignment = Alignment.Center
     ) {
-        // 🔷 Header
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(250.dp)
-                .shadow(4.dp, RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
-                .background(
-                    Brush.verticalGradient(colors = BackgroundGradient),
-                    shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
-                )
-                .statusBarsPadding(), // esto hace que suba hasta el borde del notch
-            contentAlignment = Alignment.Center
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                MediTurnLogo()
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = "Bienvenido a MediTurn",
-                    color = WhiteText,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "Tu salud, nuestra prioridad",
-                    color = WhiteTransparent,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
 
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .background(Color.White),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Email
-            OutlinedTextField(
-                value = email,
-                onValueChange = { loginViewModel.email.value = it },
-                label = { Text("Correo electrónico") },
-                placeholder = { Text("tu@email.com") },
-                singleLine = true,
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = BluePrimary,
-                    unfocusedBorderColor = Color.Gray,
-                    cursorColor = BluePrimary,
-                    focusedLabelColor = BluePrimary,
-                    unfocusedLabelColor = Color.DarkGray,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Password
-            OutlinedTextField(
-                value = password,
-                onValueChange = { loginViewModel.password.value = it },
-                label = { Text("Contraseña") },
-                placeholder = { Text("********") },
-                singleLine = true,
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth(),
-                visualTransformation = PasswordVisualTransformation(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = BluePrimary,
-                    unfocusedBorderColor = Color.Gray,
-                    cursorColor = BluePrimary,
-                    focusedLabelColor = BluePrimary,
-                    unfocusedLabelColor = Color.DarkGray,
-                    focusedTextColor = Color.Black,
-                    unfocusedTextColor = Color.Black,
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Mostrar error si existe
-            errorMessage?.let {
-                Text(text = it, color = Color.Red, fontSize = 14.sp)
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            // Botón Iniciar sesión
-            Button(
-                onClick = { loginViewModel.login() },
-                colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth()
+            // 🔷 Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(250.dp)
+                    .shadow(4.dp, RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                    .background(
+                        Brush.verticalGradient(colors = BackgroundGradient),
+                        shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                    )
+                    .statusBarsPadding(),
+                contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "Iniciar sesión",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    MediTurnLogo()
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "Bienvenido a MediTurn",
+                        color = WhiteText,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "Tu salud, nuestra prioridad",
+                        color = WhiteTransparent,
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
+            // 🔹 Formulario de login
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Spacer(modifier = Modifier.height(32.dp))
 
-            TextButton(onClick = { /* TODO */ }) {
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { loginViewModel.email.value = it },
+                    label = { Text("Correo electrónico") },
+                    placeholder = { Text("tu@email.com") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(50),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = BluePrimary,
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = BluePrimary,
+                        focusedLabelColor = BluePrimary,
+                        unfocusedLabelColor = Color.DarkGray
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { loginViewModel.password.value = it },
+                    label = { Text("Contraseña") },
+                    placeholder = { Text("********") },
+                    singleLine = true,
+                    visualTransformation = PasswordVisualTransformation(),
+                    shape = RoundedCornerShape(50),
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = BluePrimary,
+                        unfocusedBorderColor = Color.Gray,
+                        cursorColor = BluePrimary,
+                        focusedLabelColor = BluePrimary,
+                        unfocusedLabelColor = Color.DarkGray
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // 🔹 Error message
+                errorMessage?.let {
+                    Text(
+                        text = it,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                // 🔹 Botón login o cargando
+                Button(
+                    onClick = { loginViewModel.login() },
+                    colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
+                    shape = RoundedCornerShape(50),
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isLoading
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "Iniciar sesión",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                TextButton(onClick = { /* TODO: recuperar contraseña */ }) {
+                    Text(
+                        text = "¿Olvidaste tu contraseña?",
+                        color = BluePrimary,
+                        fontSize = 14.sp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(vertical = 8.dp),
+                    color = Color.LightGray
+                )
+
                 Text(
-                    text = "¿Olvidaste tu contraseña?",
-                    color = BluePrimary,
+                    text = "¿No tienes una cuenta?",
+                    color = Color.Gray,
                     fontSize = 14.sp
                 )
-            }
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .padding(vertical = 8.dp),
-                color = Color.LightGray
-            )
-
-            Text(
-                text = "¿No tienes una cuenta?",
-                color = Color.Gray,
-                fontSize = 14.sp
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedButton(
-                onClick = { navController.navigate(Routes.Register.route) },
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenAccent),
-                border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
-                shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = "Crear cuenta nueva",
-                    color = GreenAccent,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                OutlinedButton(
+                    onClick = { navController.navigate(Routes.Register.route) },
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = GreenAccent),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(width = 1.dp),
+                    shape = RoundedCornerShape(50),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Crear cuenta nueva",
+                        color = GreenAccent,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
-
     }
 }
-

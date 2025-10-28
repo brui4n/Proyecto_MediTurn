@@ -1,7 +1,7 @@
 package com.tecsup.mediturn
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.tecsup.mediturn.data.repository.RetrofitInstance
+import com.tecsup.mediturn.data.remote.RetrofitInstance
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith

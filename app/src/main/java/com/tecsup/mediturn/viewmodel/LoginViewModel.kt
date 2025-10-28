@@ -5,21 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.tecsup.mediturn.data.model.Patient
+import com.tecsup.mediturn.data.remote.RetrofitInstance
 import com.tecsup.mediturn.data.repository.PatientRepository
 import com.tecsup.mediturn.data.session.SessionManager
 import kotlinx.coroutines.launch
 
-/**
- * ViewModel para manejar el estado del Login y la sesión del usuario.
- *
- * Autor: Bryan Coronel
- * Proyecto: MediTurn
- * Fecha: Octubre 2025
- */
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository = PatientRepository()
     private val sessionManager = SessionManager(application)
+    private val repository = PatientRepository(
+        api = RetrofitInstance.patientApi(application)
+    )
 
     var email = mutableStateOf("")
     var password = mutableStateOf("")
@@ -39,24 +35,25 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 isLoading.value = true
-                val patients = repository.getPatients()
 
-                val user = patients.find {
-                    it.email.equals(emailInput, ignoreCase = true) &&
-                            it.password == passwordInput
-                }
+                val response = repository.login(emailInput, passwordInput)
 
-                if (user != null) {
-                    loggedInUser.value = user
+                if (response != null) {
+                    loggedInUser.value = response.patient
                     errorMessage.value = null
 
-                    // Guardar sesión en DataStore
-                    sessionManager.saveUserSession(user.id, user.name, user.email)
+                    sessionManager.saveUserSession(
+                        response.patient.id,
+                        response.patient.name,
+                        response.patient.email,
+                        response.access_token,
+                        response.refresh_token
+                    )
                 } else {
-                    errorMessage.value = "Correo o contraseña incorrectos"
+                    errorMessage.value = "Credenciales incorrectas"
                 }
-
             } catch (e: Exception) {
+                e.printStackTrace()
                 errorMessage.value = "Error al conectar con el servidor"
             } finally {
                 isLoading.value = false
@@ -64,7 +61,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // 🔹 Cargar sesión almacenada (por ejemplo, en el SplashScreen)
     fun loadSession() {
         viewModelScope.launch {
             sessionManager.userSession.collect { session ->
@@ -83,7 +79,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    // 🔹 Cerrar sesión
     fun logout() {
         viewModelScope.launch {
             sessionManager.clearSession()

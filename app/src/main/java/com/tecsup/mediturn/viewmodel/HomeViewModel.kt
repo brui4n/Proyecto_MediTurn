@@ -1,15 +1,20 @@
 package com.tecsup.mediturn.viewmodel
 
+import android.app.Application
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.tecsup.mediturn.data.model.Doctor
+import com.tecsup.mediturn.data.remote.RetrofitInstance
 import com.tecsup.mediturn.data.repository.DoctorRepository
 import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val doctorRepo = DoctorRepository()
+    private val doctorRepo = DoctorRepository(
+        api = RetrofitInstance.doctorApi(application)
+    )
 
     // Estado de búsqueda
     var searchQuery = mutableStateOf("")

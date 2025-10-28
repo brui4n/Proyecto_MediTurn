@@ -1,23 +1,23 @@
 package com.tecsup.mediturn.data.repository
 
 import com.tecsup.mediturn.data.model.Doctor
-import com.tecsup.mediturn.data.repository.RetrofitInstance
+import com.tecsup.mediturn.data.remote.DoctorApi
 
-class DoctorRepository {
+class DoctorRepository(private val api: DoctorApi) {
 
     suspend fun getDoctors(): List<Doctor> {
-        return RetrofitInstance.api.getDoctors()
+        return api.getDoctors()
     }
 
     suspend fun getDoctorById(id: Int): Doctor {
-        return RetrofitInstance.api.getDoctor(id)
+        return api.getDoctor(id)
     }
 
     suspend fun getDoctorsBySpecialty(specialty: String): List<Doctor> {
-        return emptyList()
+        return api.getDoctorsBySpecialty(specialty)
     }
 
     suspend fun searchDoctorsByName(query: String): List<Doctor> {
-        return emptyList()
+        return api.searchDoctorsByName(query)
     }
 }
