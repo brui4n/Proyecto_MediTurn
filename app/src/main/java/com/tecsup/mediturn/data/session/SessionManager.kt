@@ -5,7 +5,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.tecsup.mediturn.data.model.Patient
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 // Instancia de DataStore
@@ -21,14 +23,18 @@ class SessionManager(private val context: Context) {
         private val USER_ID = intPreferencesKey("user_id")
         private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_EMAIL = stringPreferencesKey("user_email")
+        private val ACCESS_TOKEN = stringPreferencesKey("access_token")
+        private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
     }
 
     // Guarda los datos del usuario actual
-    suspend fun saveUserSession(id: Int, name: String, email: String) {
+    suspend fun saveUserSession(id: Int, name: String, email: String, accesToken: String, refreshToken: String) {
         context.dataStore.edit { prefs ->
             prefs[USER_ID] = id
             prefs[USER_NAME] = name
             prefs[USER_EMAIL] = email
+            prefs[ACCESS_TOKEN] = accesToken
+            prefs[REFRESH_TOKEN] = refreshToken
         }
     }
 
@@ -43,6 +49,11 @@ class SessionManager(private val context: Context) {
     // Limpia la sesión (logout)
     suspend fun clearSession() {
         context.dataStore.edit { it.clear() }
+    }
+
+    suspend fun getAccessToken(): String? {
+        val prefs = context.dataStore.data.first()
+        return prefs[ACCESS_TOKEN]
     }
 }
 

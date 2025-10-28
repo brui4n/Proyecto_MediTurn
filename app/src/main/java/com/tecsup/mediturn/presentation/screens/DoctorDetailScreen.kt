@@ -11,11 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -86,11 +82,14 @@ fun DoctorDetailScreen(navController: NavController, doctor: Doctor) {
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
+                    val imageUrl = if (!doctor.image.isNullOrBlank()) {
+                        doctor.image
+                    } else {
+                        "https://cdn-icons-png.flaticon.com/512/2922/2922506.png"
+                    }
+
                     Image(
-                        painter = rememberAsyncImagePainter(
-                            if (doctor.imageUrl.isNotBlank()) doctor.imageUrl
-                            else "https://cdn-icons-png.flaticon.com/512/2922/2922506.png"
-                        ),
+                        painter = rememberAsyncImagePainter(imageUrl),
                         contentDescription = doctor.name,
                         modifier = Modifier
                             .size(70.dp)
@@ -117,7 +116,7 @@ fun DoctorDetailScreen(navController: NavController, doctor: Doctor) {
                                 tint = Color(0xFFFFC107)
                             )
                             Text(
-                                text = "${doctor.rating} (127)",
+                                text = "${doctor.rating ?: 0.0}",
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(start = 4.dp)
                             )
@@ -177,17 +176,17 @@ fun DoctorDetailScreen(navController: NavController, doctor: Doctor) {
                     )
                     InfoCard(
                         title = "Experiencia",
-                        description = "+${doctor.experience} años de experiencia profesional\nCertificado por el Consejo Médico"
+                        description = "+${doctor.experienceDesc ?: 0} años de experiencia profesional\nCertificado por el Consejo Médico"
                     )
                     InfoCard(
-                        title = "Idiomas",
-                        description = "Español, Inglés"
+                        title = "Ubicación",
+                        description = doctor.city ?: "Ubicación no especificada"
                     )
                 }
             }
 
             1 -> {
-                // 🟩 Horarios
+                // 🟩 Horarios (por ahora estático)
                 Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                     ScheduleCard("Lunes", "09:00 - 18:00")
                     ScheduleCard("Martes", "09:00 - 18:00")
@@ -203,7 +202,6 @@ fun DoctorDetailScreen(navController: NavController, doctor: Doctor) {
         Spacer(modifier = Modifier.height(40.dp))
     }
 }
-
 
 @Composable
 fun InfoCard(title: String, description: String) {
@@ -227,6 +225,7 @@ fun InfoCard(title: String, description: String) {
         }
     }
 }
+
 @Composable
 fun ScheduleCard(day: String, hours: String) {
     Card(
