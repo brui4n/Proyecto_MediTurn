@@ -46,11 +46,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             try {
                 if (query.isBlank()) {
-                    // Si no hay query, mostramos todos
                     doctorsFiltered.value = doctorRepo.getDoctors()
                 } else {
-                    // Buscamos por nombre y por especialidad y combinamos resultados sin duplicados
-                    val byName = try { doctorRepo.searchDoctorsByName(query) } catch (e: Exception) { emptyList() }
+                    val byName = try { doctorRepo.getDoctorsByName(query) } catch (e: Exception) { emptyList() }
                     val bySpecialty = try { doctorRepo.getDoctorsBySpecialty(query) } catch (e: Exception) { emptyList() }
 
                     val combined = (byName + bySpecialty).distinctBy { it.id }

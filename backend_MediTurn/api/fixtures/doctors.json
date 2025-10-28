@@ -1,0 +1,132 @@
+[
+  {
+    "model": "api.doctor",
+    "pk": 1,
+    "fields": {
+      "name": "Dr. Juan Pérez",
+      "specialty": "CARDIOLOGIA",
+      "experience_desc": "10 años de experiencia en cardiología clínica.",
+      "education": "Universidad Nacional de Medicina",
+      "languages": "Español, Inglés",
+      "rating": 4.8,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 2,
+    "fields": {
+      "name": "Dra. María López",
+      "specialty": "NEUROLOGIA",
+      "experience_desc": "Especialista en neurología pediátrica.",
+      "education": "Universidad Peruana Cayetano Heredia",
+      "languages": "Español",
+      "rating": 4.5,
+      "city": "Arequipa"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 3,
+    "fields": {
+      "name": "Dr. Carlos Sánchez",
+      "specialty": "OFTALMOLOGIA",
+      "experience_desc": "Cirugía ocular y tratamientos de retina.",
+      "education": "Universidad Nacional Mayor de San Marcos",
+      "languages": "Español, Inglés",
+      "rating": 4.2,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 4,
+    "fields": {
+      "name": "Dra. Ana Torres",
+      "specialty": "TRAUMATOLOGIA",
+      "experience_desc": "Atención a lesiones deportivas y fracturas.",
+      "education": "Universidad Nacional de Trujillo",
+      "languages": "Español",
+      "rating": 4.7,
+      "city": "Trujillo"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 5,
+    "fields": {
+      "name": "Dr. José Ramírez",
+      "specialty": "MEDICINA_GENERAL",
+      "experience_desc": "Atención integral de adultos y adultos mayores.",
+      "education": "Universidad Peruana Cayetano Heredia",
+      "languages": "Español",
+      "rating": 4.0,
+      "city": "Cusco"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 6,
+    "fields": {
+      "name": "Dra. Lucía Herrera",
+      "specialty": "PEDIATRIA",
+      "experience_desc": "Atención de recién nacidos y niños hasta 12 años.",
+      "education": "Universidad Nacional Mayor de San Marcos",
+      "languages": "Español, Inglés",
+      "rating": 4.9,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 7,
+    "fields": {
+      "name": "Dr. Fernando Díaz",
+      "specialty": "CARDIOLOGIA",
+      "experience_desc": "Intervenciones cardíacas avanzadas.",
+      "education": "Universidad Nacional de Ingeniería",
+      "languages": "Español",
+      "rating": 4.6,
+      "city": "Arequipa"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 8,
+    "fields": {
+      "name": "Dra. Valentina Cruz",
+      "specialty": "NEUROLOGIA",
+      "experience_desc": "Tratamiento de epilepsia y trastornos neurológicos.",
+      "education": "Universidad Nacional Mayor de San Marcos",
+      "languages": "Español, Inglés",
+      "rating": 4.3,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 9,
+    "fields": {
+      "name": "Dr. Ricardo Paredes",
+      "specialty": "TRAUMATOLOGIA",
+      "experience_desc": "Cirugía ortopédica y rehabilitación.",
+      "education": "Universidad Peruana Cayetano Heredia",
+      "languages": "Español",
+      "rating": 4.4,
+      "city": "Cusco"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 10,
+    "fields": {
+      "name": "Dra. Gabriela Mendoza",
+      "specialty": "PEDIATRIA",
+      "experience_desc": "Vacunación y seguimiento pediátrico.",
+      "education": "Universidad Nacional de Trujillo",
+      "languages": "Español",
+      "rating": 4.7,
+      "city": "Trujillo"
+    }
+  }
+]

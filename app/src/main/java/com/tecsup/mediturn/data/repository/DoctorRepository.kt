@@ -13,11 +13,15 @@ class DoctorRepository(private val api: DoctorApi) {
         return api.getDoctor(id)
     }
 
-    suspend fun getDoctorsBySpecialty(specialty: String): List<Doctor> {
-        return api.getDoctorsBySpecialty(specialty)
+    suspend fun getDoctorsByName(query: String): List<Doctor> {
+        return api.getDoctorsByNameOrSpecialty(name = query, specialty = null)
     }
 
-    suspend fun searchDoctorsByName(query: String): List<Doctor> {
-        return api.searchDoctorsByName(query)
+    suspend fun getDoctorsBySpecialty(specialty: String): List<Doctor> {
+        return api.getDoctorsByNameOrSpecialty(name = null, specialty = specialty)
+    }
+
+    suspend fun searchDoctorsByNameOrSpecialty(query: String): List<Doctor> {
+        return api.getDoctorsByNameOrSpecialty(name = query, specialty = query)
     }
 }

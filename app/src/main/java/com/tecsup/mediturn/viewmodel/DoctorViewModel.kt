@@ -35,7 +35,7 @@ class DoctorViewModel(application: Application) : AndroidViewModel(application) 
     fun searchDoctors(query: String) {
         viewModelScope.launch {
             try {
-                val response = doctorRepository.searchDoctorsByName(query)
+                val response = doctorRepository.searchDoctorsByNameOrSpecialty(query)
                 _doctors.value = Resource.Success(response)
             } catch (e: Exception) {
                 _doctors.value = Resource.Error(e.localizedMessage ?: "Error en la búsqueda")

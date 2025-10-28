@@ -9,10 +9,24 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
 
+
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
-    permission_classes = [IsAuthenticated]  # 🔹 Solo usuarios autenticados
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Doctor.objects.all()
+        specialty = self.request.query_params.get('specialty')
+        name = self.request.query_params.get('name')
+
+        if specialty:
+            queryset = queryset.filter(specialty__icontains=specialty)  # iexact ignora mayúsculas/minúsculas
+
+        if name:
+            queryset = queryset.filter(name__icontains=name)  # icontains = búsqueda parcial sin importar mayúsculas
+
+        return queryset
 
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()

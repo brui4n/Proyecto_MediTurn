@@ -13,9 +13,9 @@ interface DoctorApi {
     @GET("doctors/{id}/")
     suspend fun getDoctor(@Path("id") id: Int): Doctor
 
-    @GET("doctors/by_specialty/")
-    suspend fun getDoctorsBySpecialty(@Query("specialty") specialty: String): List<Doctor>
-
-    @GET("doctors/search/")
-    suspend fun searchDoctorsByName(@Query("query") query: String): List<Doctor>
+    @GET("doctors/")
+    suspend fun getDoctorsByNameOrSpecialty(
+        @Query("name") name: String?,
+        @Query("specialty") specialty: String?
+    ): List<Doctor>
 }
