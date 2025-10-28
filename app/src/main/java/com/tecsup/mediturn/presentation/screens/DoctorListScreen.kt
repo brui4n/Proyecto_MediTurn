@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.tecsup.mediturn.navigation.Routes
 import com.tecsup.mediturn.presentation.components.DoctorCard
 import com.tecsup.mediturn.ui.theme.BluePrimary
 import com.tecsup.mediturn.ui.theme.GreenAccent
@@ -136,9 +137,9 @@ fun DoctorListScreen(
                         items(doctors) { doctor ->
                             DoctorCard(
                                 doctor = doctor,
-                                onDetailClick = {
-                                    navController.navigate("doctor_detail/${doctor.id}")
-                                }
+                                onDetailClick = rememberUpdatedState {
+                                    navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
+                                }.value
                             )
                         }
                     }

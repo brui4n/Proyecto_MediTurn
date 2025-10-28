@@ -47,6 +47,14 @@ fun NavGraph() {
             DoctorListScreen(navController = navController, specialty = specialty)
         }
 
+        composable(
+            route = Routes.DoctorDetail.route + "/{doctorId}",
+            arguments = listOf(navArgument("doctorId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getInt("doctorId") ?: 0
+            DoctorDetailScreen(navController = navController, doctorId = doctorId)
+        }
+
 
 
         // Otras pantallas

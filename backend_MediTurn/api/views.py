@@ -3,8 +3,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .models import Doctor, Patient, Slot, Appointment
-from .serializers import DoctorSerializer, PatientSerializer, SlotSerializer, AppointmentSerializer
+from .models import Doctor, Patient, Slot, Appointment, DoctorSchedule
+from .serializers import DoctorSerializer, PatientSerializer, SlotSerializer, AppointmentSerializer, DoctorScheduleSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
@@ -42,6 +42,19 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
     permission_classes = [IsAuthenticated]
+
+class DoctorScheduleViewSet(viewsets.ModelViewSet):
+    queryset = DoctorSchedule.objects.all()
+    serializer_class = DoctorScheduleSerializer
+    permission_classes = [IsAuthenticated]
+
+    # opcional: filtrar por doctor usando query param
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        doctor_id = self.request.query_params.get('doctor')
+        if doctor_id:
+            queryset = queryset.filter(doctor_id=doctor_id)
+        return queryset
 
 
 

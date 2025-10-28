@@ -303,7 +303,10 @@ fun HomeScreen(navController: NavController,
                         items(doctorsFiltered.size) { index ->
                             val doctor = doctorsFiltered[index]
                             DoctorCard(
-                                doctor = doctor){}
+                                doctor = doctor,
+                                onDetailClick = {
+                                    navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
+                                })
                         }
                     }
                 }
