@@ -74,6 +74,16 @@ fun HomeScreen(navController: NavController,
         "Pediatría" to "👶"
     )
 
+    val specialtyMap = mapOf(
+        "Cardiología" to "CARDIOLOGIA",
+        "Neurología" to "NEUROLOGIA",
+        "Oftalmología" to "OFTALMOLOGIA",
+        "Traumatología" to "TRAUMATOLOGIA",
+        "Medicina General" to "MEDICINA_GENERAL",
+        "Pediatría" to "PEDIATRIA"
+    )
+
+
     Scaffold(
         topBar = {
             var expanded by remember { mutableStateOf(false) }
@@ -263,7 +273,8 @@ fun HomeScreen(navController: NavController,
                                 .height(90.dp)
                                 .fillMaxWidth()
                                 .clickable {
-                                    navController.navigate("${Routes.DoctorList.route}/$name")
+                                    val specialtyCode = specialtyMap[name] ?: name
+                                    navController.navigate("${Routes.DoctorList.route}/$specialtyCode")
                                 }
                         ) {
                             Column(
@@ -292,7 +303,10 @@ fun HomeScreen(navController: NavController,
                         items(doctorsFiltered.size) { index ->
                             val doctor = doctorsFiltered[index]
                             DoctorCard(
-                                doctor = doctor){}
+                                doctor = doctor,
+                                onDetailClick = {
+                                    navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
+                                })
                         }
                     }
                 }

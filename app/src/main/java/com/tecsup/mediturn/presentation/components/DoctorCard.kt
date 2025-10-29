@@ -40,11 +40,14 @@ fun DoctorCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // Imagen del doctor
+                val imageUrl = if (!doctor.image.isNullOrBlank()) {
+                    doctor.image
+                } else {
+                    "https://cdn-icons-png.flaticon.com/512/2922/2922506.png"
+                }
+
                 Image(
-                    painter = rememberAsyncImagePainter(
-                        if (doctor.imageUrl.isNotBlank()) doctor.imageUrl
-                        else "https://cdn-icons-png.flaticon.com/512/2922/2922506.png"
-                    ),
+                    painter = rememberAsyncImagePainter(imageUrl),
                     contentDescription = doctor.name,
                     modifier = Modifier
                         .size(70.dp)
@@ -75,7 +78,7 @@ fun DoctorCard(
                             tint = MaterialTheme.colorScheme.tertiary
                         )
                         Text(
-                            text = "${doctor.rating}",
+                            text = "${doctor.rating ?: 0.0}",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium
                         )
@@ -83,7 +86,18 @@ fun DoctorCard(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // Disponibilidad
+                    // Ciudad (opcional)
+                    doctor.city?.let {
+                        Text(
+                            text = it,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    // Disponibilidad temporal (puedes cambiar esto luego según slots)
                     Text(
                         text = "Disponible hoy",
                         color = GreenAccent,

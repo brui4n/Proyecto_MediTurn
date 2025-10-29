@@ -1,0 +1,262 @@
+[
+  {
+    "model": "api.doctor",
+    "pk": 1,
+    "fields": {
+      "name": "Dr. Juan Pérez",
+      "specialty": "CARDIOLOGIA",
+      "experience_desc": "Cardiólogo clínico con más de 10 años de experiencia en diagnóstico y tratamiento de enfermedades cardiovasculares. Enfocado en la prevención y control de hipertensión.",
+      "education": "Universidad Nacional de Medicina",
+      "languages": "Español, Inglés",
+      "rating": 4.8,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 2,
+    "fields": {
+      "name": "Dra. María López",
+      "specialty": "NEUROLOGIA",
+      "experience_desc": "Neuróloga pediátrica especializada en trastornos del desarrollo neurológico y epilepsia infantil. Amplia experiencia en diagnóstico temprano.",
+      "education": "Universidad Peruana Cayetano Heredia",
+      "languages": "Español",
+      "rating": 4.6,
+      "city": "Arequipa"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 3,
+    "fields": {
+      "name": "Dr. Carlos Sánchez",
+      "specialty": "OFTALMOLOGIA",
+      "experience_desc": "Especialista en cirugía ocular, cataratas y tratamientos de retina. Experiencia en corrección visual con tecnología láser.",
+      "education": "Universidad Nacional Mayor de San Marcos",
+      "languages": "Español, Inglés",
+      "rating": 4.4,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 4,
+    "fields": {
+      "name": "Dra. Ana Torres",
+      "specialty": "TRAUMATOLOGIA",
+      "experience_desc": "Traumatóloga enfocada en lesiones deportivas, fracturas y rehabilitación musculoesquelética. Promueve la recuperación funcional integral.",
+      "education": "Universidad Nacional de Trujillo",
+      "languages": "Español",
+      "rating": 4.7,
+      "city": "Trujillo"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 5,
+    "fields": {
+      "name": "Dr. José Ramírez",
+      "specialty": "MEDICINA_GENERAL",
+      "experience_desc": "Médico general con amplia experiencia en atención primaria, manejo de enfermedades comunes y seguimiento preventivo de la salud.",
+      "education": "Universidad Peruana Cayetano Heredia",
+      "languages": "Español",
+      "rating": 4.3,
+      "city": "Cusco"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 6,
+    "fields": {
+      "name": "Dra. Lucía Herrera",
+      "specialty": "PEDIATRIA",
+      "experience_desc": "Pediatra dedicada al bienestar infantil desde el nacimiento hasta la adolescencia. Experta en vacunación, crecimiento y desarrollo saludable.",
+      "education": "Universidad Nacional Mayor de San Marcos",
+      "languages": "Español, Inglés",
+      "rating": 4.9,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 7,
+    "fields": {
+      "name": "Dr. Fernando Díaz",
+      "specialty": "CARDIOLOGIA",
+      "experience_desc": "Cardiólogo intervencionista especializado en procedimientos de cateterismo y tratamiento de arritmias complejas.",
+      "education": "Universidad Nacional de Ingeniería",
+      "languages": "Español",
+      "rating": 4.5,
+      "city": "Arequipa"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 8,
+    "fields": {
+      "name": "Dra. Valentina Cruz",
+      "specialty": "NEUROLOGIA",
+      "experience_desc": "Experta en diagnóstico y tratamiento de migrañas, trastornos del sueño y enfermedades neurodegenerativas.",
+      "education": "Universidad Nacional Mayor de San Marcos",
+      "languages": "Español, Inglés",
+      "rating": 4.4,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 9,
+    "fields": {
+      "name": "Dr. Ricardo Paredes",
+      "specialty": "TRAUMATOLOGIA",
+      "experience_desc": "Cirujano ortopédico con experiencia en reemplazos articulares y terapia de rehabilitación postoperatoria.",
+      "education": "Universidad Peruana Cayetano Heredia",
+      "languages": "Español",
+      "rating": 4.5,
+      "city": "Cusco"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 10,
+    "fields": {
+      "name": "Dra. Gabriela Mendoza",
+      "specialty": "PEDIATRIA",
+      "experience_desc": "Pediatra enfocada en prevención y nutrición infantil. Atención empática y orientación familiar.",
+      "education": "Universidad Nacional de Trujillo",
+      "languages": "Español",
+      "rating": 4.7,
+      "city": "Trujillo"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 11,
+    "fields": {
+      "name": "Dr. Javier Rojas",
+      "specialty": "MEDICINA_GENERAL",
+      "experience_desc": "Médico general con experiencia en atención comunitaria y promoción de estilos de vida saludables.",
+      "education": "Universidad Científica del Sur",
+      "languages": "Español, Inglés",
+      "rating": 4.6,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 12,
+    "fields": {
+      "name": "Dra. Elena Gutiérrez",
+      "specialty": "NEUROLOGIA",
+      "experience_desc": "Neuróloga clínica especializada en enfermedades neurovasculares y prevención del accidente cerebrovascular.",
+      "education": "Universidad Nacional de Piura",
+      "languages": "Español",
+      "rating": 4.8,
+      "city": "Piura"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 13,
+    "fields": {
+      "name": "Dr. Andrés Vega",
+      "specialty": "OFTALMOLOGIA",
+      "experience_desc": "Otorrinolaringólogo reconvertido en oftalmólogo con experiencia en corrección de visión y cirugía refractiva.",
+      "education": "Universidad Nacional Mayor de San Marcos",
+      "languages": "Español, Inglés",
+      "rating": 4.3,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 14,
+    "fields": {
+      "name": "Dra. Mónica Rivera",
+      "specialty": "MEDICINA_GENERAL",
+      "experience_desc": "Médica general con experiencia en atención preventiva y educación sanitaria.",
+      "education": "Universidad Peruana de Ciencias Aplicadas",
+      "languages": "Español, Inglés",
+      "rating": 4.7,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 15,
+    "fields": {
+      "name": "Dr. Sebastián Ramos",
+      "specialty": "CARDIOLOGIA",
+      "experience_desc": "Cardiólogo clínico con experiencia en rehabilitación cardíaca y control de factores de riesgo cardiovascular.",
+      "education": "Universidad Nacional de San Agustín",
+      "languages": "Español",
+      "rating": 4.9,
+      "city": "Arequipa"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 16,
+    "fields": {
+      "name": "Dra. Natalia Castro",
+      "specialty": "MEDICINA_GENERAL",
+      "experience_desc": "Médica general enfocada en la atención familiar y programas de control preventivo.",
+      "education": "Universidad Nacional de Trujillo",
+      "languages": "Español",
+      "rating": 4.6,
+      "city": "Trujillo"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 17,
+    "fields": {
+      "name": "Dr. Diego Alarcón",
+      "specialty": "TRAUMATOLOGIA",
+      "experience_desc": "Traumatólogo con especialización en lesiones de columna y terapia de recuperación postoperatoria.",
+      "education": "Universidad Peruana Cayetano Heredia",
+      "languages": "Español, Inglés",
+      "rating": 4.4,
+      "city": "Lima"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 18,
+    "fields": {
+      "name": "Dra. Paola Ramírez",
+      "specialty": "PEDIATRIA",
+      "experience_desc": "Pediatra enfocada en terapia respiratoria infantil y prevención de enfermedades infecciosas.",
+      "education": "Universidad Nacional Mayor de San Marcos",
+      "languages": "Español",
+      "rating": 4.8,
+      "city": "Cusco"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 19,
+    "fields": {
+      "name": "Dr. Álvaro León",
+      "specialty": "CARDIOLOGIA",
+      "experience_desc": "Cardiólogo especializado en diagnóstico por imágenes y control de insuficiencia cardíaca.",
+      "education": "Universidad Nacional de San Antonio Abad del Cusco",
+      "languages": "Español, Inglés",
+      "rating": 4.5,
+      "city": "Cusco"
+    }
+  },
+  {
+    "model": "api.doctor",
+    "pk": 20,
+    "fields": {
+      "name": "Dra. Isabel Morales",
+      "specialty": "OFTALMOLOGIA",
+      "experience_desc": "Oftalmóloga especializada en glaucoma y enfermedades del nervio óptico. Comprometida con la salud visual integral.",
+      "education": "Universidad Peruana Cayetano Heredia",
+      "languages": "Español",
+      "rating": 4.7,
+      "city": "Lima"
+    }
+  }
+]
