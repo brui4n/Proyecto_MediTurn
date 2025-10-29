@@ -59,4 +59,29 @@ class PatientRepository(private val api: PatientApi) {
             null
         }
     }
+
+    suspend fun getPatientById(id: Int): Patient = api.getPatient(id)
+
+    suspend fun changePassword(patientId: Int, oldPassword: String, newPassword: String): Boolean {
+        return try {
+            val data = mapOf<String, Any>(
+                "patient_id" to patientId,
+                "old_password" to oldPassword,
+                "new_password" to newPassword
+            )
+            val res = api.changePassword(data)
+            res.isSuccessful
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
+    }
+
+    suspend fun updatePatient(id: Int, name: String?, email: String?, phone: String?): Patient {
+        val data = mutableMapOf<String, Any>()
+        if (!name.isNullOrBlank()) data["name"] = name
+        if (!email.isNullOrBlank()) data["email"] = email
+        if (!phone.isNullOrBlank()) data["phone"] = phone
+        return api.updatePatient(id, data)
+    }
 }

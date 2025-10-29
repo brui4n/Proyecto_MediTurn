@@ -7,6 +7,8 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.PUT
+import retrofit2.http.PATCH
 
 interface PatientApi {
 
@@ -23,5 +25,14 @@ interface PatientApi {
 
     @POST("register/")
     suspend fun registerPatient(@Body data: Map<String, @JvmSuppressWildcards Any>): Response<Patient>
+
+    @POST("change-password/")
+    suspend fun changePassword(@Body data: Map<String, @JvmSuppressWildcards Any>): Response<JsonObject>
+
+    @PATCH("patients/{id}/")
+    suspend fun updatePatient(
+        @Path("id") id: Int,
+        @Body data: Map<String, @JvmSuppressWildcards Any>
+    ): Patient
 
 }

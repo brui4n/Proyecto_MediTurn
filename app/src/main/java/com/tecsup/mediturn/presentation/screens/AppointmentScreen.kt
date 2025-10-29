@@ -24,6 +24,7 @@ import androidx.navigation.NavController
 import com.tecsup.mediturn.ui.theme.BluePrimary
 import com.tecsup.mediturn.data.model.Slot
 import androidx.compose.foundation.layout.FlowRow
+import com.tecsup.mediturn.navigation.Routes
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -61,7 +62,7 @@ fun AppointmentScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp)
     ) {
@@ -71,15 +72,23 @@ fun AppointmentScreen(
             modifier = Modifier.padding(top = 40.dp)
         ) {
             IconButton(onClick = { navController.popBackStack() }) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Volver",
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
             }
-            Text("Agendar cita", style = MaterialTheme.typography.titleLarge)
+            Text(
+                "Agendar cita",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
         // Tipo de consulta
-        Text("Tipo de consulta *", fontWeight = FontWeight.SemiBold)
+        Text("Tipo de consulta *", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.padding(top = 8.dp)
@@ -101,14 +110,14 @@ fun AppointmentScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         // Selección de fecha
-        Text("Fecha de la cita *", fontWeight = FontWeight.SemiBold)
+        Text("Fecha de la cita *", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         var expanded by remember { mutableStateOf(false) }
 
         Box(modifier = Modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = selectedDate.let { if (it.isEmpty()) "" else formatDateDisplay(it) },
                 onValueChange = {},
-                placeholder = { Text("Selecciona una fecha") },
+                placeholder = { Text("Selecciona una fecha", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)) },
                 readOnly = true,
                 modifier = Modifier.fillMaxWidth(),
                 trailingIcon = {
@@ -121,11 +130,11 @@ fun AppointmentScreen(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.background(Color.White)
+                modifier = Modifier.background(MaterialTheme.colorScheme.surface)
             ) {
                 next30Days.forEach { fecha ->
                     DropdownMenuItem(
-                        text = { Text(formatDateDisplay(fecha)) },
+                        text = { Text(formatDateDisplay(fecha), color = MaterialTheme.colorScheme.onSurface) },
                         onClick = {
                             selectedDate = fecha
                             selectedSlot = null
@@ -144,7 +153,7 @@ fun AppointmentScreen(
                 CircularProgressIndicator(color = BluePrimary)
             }
         } else if (selectedDate.isEmpty()) {
-            Text("Selecciona una fecha para ver los horarios", color = Color.Gray)
+            Text("Selecciona una fecha para ver los horarios", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
         } else {
 
             Log.d("DEBUG_SLOT", "selectedDate=$selectedDate")
@@ -154,11 +163,11 @@ fun AppointmentScreen(
                 slot.date.trim() == selectedDate.trim()
             }
 
-            Text("Hora de la cita *", fontWeight = FontWeight.SemiBold)
+            Text("Hora de la cita *", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
 
             if (slotsForDate.isEmpty()) {
-                Text("No hay horarios disponibles", color = Color.Gray)
+                Text("No hay horarios disponibles", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
             } else {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -173,12 +182,12 @@ fun AppointmentScreen(
                                 containerColor = when {
                                     selectedSlot == slot -> BluePrimary
                                     !enabled -> Color(0xFFFFCDD2)
-                                    else -> Color.White
+                                    else -> MaterialTheme.colorScheme.surface
                                 },
                                 contentColor = when {
                                     selectedSlot == slot -> Color.White
                                     !enabled -> Color.DarkGray
-                                    else -> Color.Black
+                                    else -> MaterialTheme.colorScheme.onSurface
                                 }
                             ),
                             shape = RoundedCornerShape(50)
@@ -193,11 +202,11 @@ fun AppointmentScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         // Motivo
-        Text("Motivo de la consulta *", fontWeight = FontWeight.SemiBold)
+        Text("Motivo de la consulta *", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         OutlinedTextField(
             value = motivo,
             onValueChange = { motivo = it },
-            placeholder = { Text("Describe brevemente el motivo de tu consulta...") },
+            placeholder = { Text("Describe brevemente el motivo de tu consulta...", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp)
@@ -207,14 +216,14 @@ fun AppointmentScreen(
 
         // Info importante
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F0FE)),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("ℹ️ Importante", fontWeight = FontWeight.SemiBold, color = BluePrimary)
                 Text(
                     "Recuerda llegar 10 minutos antes de tu cita. Recibirás una confirmación por email y SMS.",
-                    color = Color.DarkGray
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -223,7 +232,11 @@ fun AppointmentScreen(
 
         // Botón confirmar
         Button(
-            onClick = { navController.navigate("payment") },
+            onClick = {
+                selectedSlot?.let { slot ->
+                    navController.navigate("${Routes.Payment.route}/${doctorId}/${slot.id}/${selectedConsultationType}")
+                }
+            },
             enabled = selectedSlot != null && motivo.isNotBlank(),
             modifier = Modifier
                 .fillMaxWidth()

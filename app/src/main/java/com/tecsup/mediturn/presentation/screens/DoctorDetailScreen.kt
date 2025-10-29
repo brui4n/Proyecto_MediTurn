@@ -75,7 +75,7 @@ fun DoctorDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .background(Color(0xFFF8F9FA))
+                    .background(MaterialTheme.colorScheme.background)
             ) {
                 // 🔹 Encabezado
                 Box(
@@ -116,7 +116,8 @@ fun DoctorDetailScreen(
                         .padding(horizontal = 16.dp)
                         .offset(y = (-40).dp),
                     shape = RoundedCornerShape(20.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -141,7 +142,8 @@ fun DoctorDetailScreen(
                                 Text(
                                     text = doctor.name,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp
+                                    fontSize = 18.sp,
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
                                     text = doctor.specialty,
@@ -186,18 +188,18 @@ fun DoctorDetailScreen(
                 TabRow(
                     selectedTabIndex = selectedTab,
                     modifier = Modifier.padding(horizontal = 16.dp),
-                    containerColor = Color.Transparent,
-                    contentColor = BluePrimary
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 ) {
                     Tab(
                         selected = selectedTab == 0,
                         onClick = { selectedTab = 0 },
-                        text = { Text("Información") }
+                        text = { Text("Información", color = MaterialTheme.colorScheme.onSurface) }
                     )
                     Tab(
                         selected = selectedTab == 1,
                         onClick = { selectedTab = 1 },
-                        text = { Text("Horarios") }
+                        text = { Text("Horarios", color = MaterialTheme.colorScheme.onSurface) }
                     )
                 }
 
@@ -276,7 +278,7 @@ fun InfoCard(title: String, description: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -285,10 +287,10 @@ fun InfoCard(title: String, description: String) {
                 text = title,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 16.sp,
-                color = BluePrimary
+                color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = description, color = Color.Gray, fontSize = 14.sp)
+            Text(text = description, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
         }
     }
 }
@@ -299,7 +301,7 @@ fun ScheduleCard(day: String, hours: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -309,8 +311,8 @@ fun ScheduleCard(day: String, hours: String) {
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = day, fontWeight = FontWeight.SemiBold, color = BluePrimary)
-            Text(text = hours, color = Color.Gray)
+            Text(text = day, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+            Text(text = hours, color = MaterialTheme.colorScheme.onSurface)
         }
     }
 }

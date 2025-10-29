@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.tecsup.mediturn.data.model.Patient
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,7 @@ class SessionManager(private val context: Context) {
         private val USER_EMAIL = stringPreferencesKey("user_email")
         private val ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+        private val DARK_MODE = booleanPreferencesKey("dark_mode")
     }
 
     // Guarda los datos del usuario actual
@@ -54,6 +56,23 @@ class SessionManager(private val context: Context) {
     suspend fun getAccessToken(): String? {
         val prefs = context.dataStore.data.first()
         return prefs[ACCESS_TOKEN]
+    }
+
+    // Actualiza nombre y email almacenados en sesión
+    suspend fun updateBasicInfo(name: String?, email: String?) {
+        context.dataStore.edit { prefs ->
+            if (!name.isNullOrBlank()) prefs[USER_NAME] = name
+            if (!email.isNullOrBlank()) prefs[USER_EMAIL] = email
+        }
+    }
+
+    // Preferencia de modo oscuro
+    val darkModeEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[DARK_MODE] ?: false
+    }
+
+    suspend fun setDarkMode(enabled: Boolean) {
+        context.dataStore.edit { it[DARK_MODE] = enabled }
     }
 }
 

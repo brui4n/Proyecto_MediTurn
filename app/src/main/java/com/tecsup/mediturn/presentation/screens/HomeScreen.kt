@@ -36,6 +36,10 @@ import com.tecsup.mediturn.ui.theme.*
 import com.tecsup.mediturn.viewmodel.HomeViewModel
 import com.tecsup.mediturn.viewmodel.LoginViewModel
 import com.tecsup.mediturn.data.session.UserSession
+import com.tecsup.mediturn.data.remote.RetrofitInstance
+import com.tecsup.mediturn.data.repository.AppointmentRepository
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(navController: NavController,
@@ -73,6 +77,36 @@ fun HomeScreen(navController: NavController,
         "Medicina General" to "🩺",
         "Pediatría" to "👶"
     )
+    // Próxima cita del paciente
+    val repo = remember { AppointmentRepository(RetrofitInstance.appointmentApi(context)) }
+    var nextDoctor by remember { mutableStateOf<String?>(null) }
+    var nextSpecialty by remember { mutableStateOf<String?>(null) }
+    var nextDate by remember { mutableStateOf<String?>(null) }
+    var nextTime by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(userSession) {
+        val user = userSession ?: return@LaunchedEffect
+        try {
+            val upcoming = repo.getAppointmentsByPatient(user.id, scope = "upcoming")
+            val first = upcoming.firstOrNull()
+            if (first != null) {
+                nextDoctor = first.doctor.name
+                nextSpecialty = first.doctor.specialty
+                val parts = first.slot.date.split("-")
+                nextDate = "${parts[2]}/${parts[1]}/${parts[0]}"
+                val h24 = DateTimeFormatter.ofPattern("HH:mm")
+                val h12 = DateTimeFormatter.ofPattern("hh:mm a")
+                nextTime = try { LocalTime.parse(first.slot.time.substring(0,5), h24).format(h12) } catch (_: Exception) { first.slot.time }
+            } else {
+                nextDoctor = null
+                nextSpecialty = null
+                nextDate = null
+                nextTime = null
+            }
+        } catch (_: Exception) {
+            // silencioso para no romper home si backend falla
+        }
+    }
 
     val specialtyMap = mapOf(
         "Cardiología" to "CARDIOLOGIA",
@@ -137,10 +171,6 @@ fun HomeScreen(navController: NavController,
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }
                             ) {
-                                DropdownMenuItem(
-                                    text = { Text("Perfil") },
-                                    onClick = { expanded = false /* Ir al perfil */ }
-                                )
                                 DropdownMenuItem(
                                     text = { Text("Cerrar sesión", color = Color.Red) },
                                     onClick = {
@@ -207,7 +237,7 @@ fun HomeScreen(navController: NavController,
                 currentRoute = Routes.Home.route
             )
         },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -222,28 +252,37 @@ fun HomeScreen(navController: NavController,
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F4FD)),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(16.dp)
                     ) {
-                        Column {
-                            Text("📅 Próxima cita", color = BluePrimary, fontSize = 14.sp)
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text("Dra. María González", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                            Text("Cardiología", color = Color.Gray)
+                        Text("📅 Próxima cita", color = BluePrimary, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        if (nextDoctor != null) {
+                            Text(nextDoctor!!, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            val extra = listOfNotNull(nextSpecialty, listOfNotNull(nextDate, nextTime).joinToString(" · ")).filter { it.isNotBlank() }.joinToString("  •  ")
+                            if (extra.isNotBlank()) Text(extra, color = Color.Gray)
+                        } else {
+                            Text("Sin próximas citas", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text("Agenda tu primera cita", color = Color.Gray)
                         }
 
+                        Spacer(modifier = Modifier.height(10.dp))
                         Button(
-                            onClick = { /* Ver cita */ },
-                            colors = ButtonDefaults.buttonColors(containerColor = BluePrimary)
+                            onClick = { navController.navigate(Routes.Citas.route) },
+                            colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
+                            shape = RoundedCornerShape(50),
+                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                            modifier = Modifier
+                                .height(36.dp)
+                                .defaultMinSize(minWidth = 88.dp)
+                                .align(Alignment.Start)
                         ) {
-                            Text("Ver")
+                            Text("Ver", maxLines = 1)
                         }
                     }
                 }

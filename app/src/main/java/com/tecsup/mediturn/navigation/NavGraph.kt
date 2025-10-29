@@ -67,7 +67,25 @@ fun NavGraph() {
 
 
 
-        composable(Routes.Payment.route) { PaymentScreen(navController) }
-        composable(Routes.PaymentSummary.route) { PaymentSummaryScreen(navController) }
+        composable(
+            route = Routes.Payment.route + "/{doctorId}/{slotId}/{type}",
+            arguments = listOf(
+                navArgument("doctorId") { type = NavType.IntType },
+                navArgument("slotId") { type = NavType.IntType },
+                navArgument("type") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getInt("doctorId") ?: 0
+            val slotId = backStackEntry.arguments?.getInt("slotId") ?: 0
+            val type = backStackEntry.arguments?.getString("type") ?: "PRESENCIAL"
+            PaymentScreen(navController, doctorId, slotId, type)
+        }
+        composable(
+            route = Routes.PaymentSummary.route + "/{appointmentId}",
+            arguments = listOf(navArgument("appointmentId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val appointmentId = backStackEntry.arguments?.getInt("appointmentId") ?: 0
+            PaymentSummaryScreen(navController, appointmentId)
+        }
     }
 }

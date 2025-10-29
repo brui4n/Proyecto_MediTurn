@@ -68,21 +68,6 @@ fun DoctorCard(
                         color = MaterialTheme.colorScheme.primary
                     )
 
-                    Spacer(modifier = Modifier.height(4.dp))
-
-                    // Rating con estrella
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Rating",
-                            tint = MaterialTheme.colorScheme.tertiary
-                        )
-                        Text(
-                            text = "${doctor.rating ?: 0.0}",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
 
                     Spacer(modifier = Modifier.height(4.dp))
 

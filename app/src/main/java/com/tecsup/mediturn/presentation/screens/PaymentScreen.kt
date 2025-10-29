@@ -18,10 +18,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
+import com.tecsup.mediturn.data.remote.RetrofitInstance
+import com.tecsup.mediturn.data.repository.AppointmentRepository
+import com.tecsup.mediturn.data.remote.dto.AppointmentCreateRequest
+import com.tecsup.mediturn.data.session.SessionManager
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import com.tecsup.mediturn.ui.theme.BluePrimary
+import com.tecsup.mediturn.navigation.Routes
 
 @Composable
-fun PaymentScreen(navController: NavController) {
+fun PaymentScreen(navController: NavController, doctorId: Int, slotId: Int, type: String) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val sessionManager = remember { SessionManager(context) }
+    val repository = remember { AppointmentRepository(RetrofitInstance.appointmentApi(context)) }
+    var isSubmitting by remember { mutableStateOf(false) }
+    var errorText by remember { mutableStateOf<String?>(null) }
     var cardName by remember { mutableStateOf("") }
     var cardNumber by remember { mutableStateOf("") }
     var expiryDate by remember { mutableStateOf("") }
@@ -30,7 +44,7 @@ fun PaymentScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
+            .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
     ) {
         // 🔹 Encabezado con degradado
@@ -177,7 +191,28 @@ fun PaymentScreen(navController: NavController) {
 
             // 🔹 Botón de confirmación
             Button(
-                onClick = { navController.navigate("payment_summary") },
+                onClick = {
+                    if (isSubmitting) return@Button
+                    scope.launch {
+                        isSubmitting = true
+                        errorText = null
+                        try {
+                            val user = sessionManager.userSession.first()
+                            val req = AppointmentCreateRequest(
+                                doctor = doctorId,
+                                patient = user?.id ?: 0,
+                                slot = slotId,
+                                consultation_type = type
+                            )
+                            val created = repository.createAppointment(req)
+                            navController.navigate("${Routes.PaymentSummary.route}/${created.id}")
+                        } catch (e: Exception) {
+                            errorText = e.message
+                        } finally {
+                            isSubmitting = false
+                        }
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(55.dp),
@@ -186,11 +221,16 @@ fun PaymentScreen(navController: NavController) {
                 elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp)
             ) {
                 Text(
-                    "Confirmar pago",
+                    if (isSubmitting) "Guardando..." else "Confirmar pago",
                     color = Color.White,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
+            }
+
+            if (errorText != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(text = "Error: $errorText", color = Color(0xFFB00020))
             }
 
             Spacer(modifier = Modifier.height(60.dp))
