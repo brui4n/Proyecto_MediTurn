@@ -55,10 +55,18 @@ fun NavGraph() {
             DoctorDetailScreen(navController = navController, doctorId = doctorId)
         }
 
+        composable(
+            route = Routes.Appointment.route + "/{doctorId}",
+            arguments = listOf(navArgument("doctorId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getInt("doctorId") ?: 0
+            AppointmentScreen(navController = navController, doctorId = doctorId)
+        }
 
 
-        // Otras pantallas
-        composable(Routes.Appointment.route) { AppointmentScreen(navController) }
+
+
+
         composable(Routes.Payment.route) { PaymentScreen(navController) }
         composable(Routes.PaymentSummary.route) { PaymentSummaryScreen(navController) }
     }

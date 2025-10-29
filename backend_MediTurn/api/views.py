@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.decorators import action
 from django.contrib.auth.hashers import make_password, check_password
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
@@ -13,7 +14,7 @@ from rest_framework.decorators import permission_classes
 class DoctorViewSet(viewsets.ModelViewSet):
     queryset = Doctor.objects.all()
     serializer_class = DoctorSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = Doctor.objects.all()
@@ -31,22 +32,67 @@ class DoctorViewSet(viewsets.ModelViewSet):
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all()
     serializer_class = PatientSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
 class SlotViewSet(viewsets.ModelViewSet):
-    queryset = Slot.objects.all()
+    queryset = Slot.objects.all()  # ✅ agrega esta línea
     serializer_class = SlotSerializer
-    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Slot.objects.all()
+        doctor_id = self.request.query_params.get('doctor_id')
+        if doctor_id is not None:
+            queryset = queryset.filter(doctor_id=doctor_id)
+        return queryset
+    # permission_classes = [IsAuthenticated]
 
 class AppointmentViewSet(viewsets.ModelViewSet):
     queryset = Appointment.objects.all()
     serializer_class = AppointmentSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
+
+    @action(detail=False, methods=['post'], url_path='create-appointment')
+    def create_appointment(self, request):
+        """
+        Crea una cita usando los IDs enviados en JSON:
+        doctor, patient, slot, consultation_type
+        """
+        doctor_id = request.data.get('doctor')
+        patient_id = request.data.get('patient')
+        slot_id = request.data.get('slot')
+        consultation_type = request.data.get('consultation_type', 'PRESENCIAL')
+
+        # Validar IDs
+        try:
+            doctor = Doctor.objects.get(id=doctor_id)
+            patient = Patient.objects.get(id=patient_id)
+            slot = Slot.objects.get(id=slot_id)
+        except (Doctor.DoesNotExist, Patient.DoesNotExist, Slot.DoesNotExist):
+            return Response({"error": "ID inválido"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not slot.available:
+            return Response({"error": "Este horario ya está reservado"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Crear cita
+        appointment = Appointment.objects.create(
+            doctor=doctor,
+            patient=patient,
+            slot=slot,
+            consultation_type=consultation_type,
+            status="Pendiente"
+        )
+
+        # Marcar slot como no disponible
+        slot.available = False
+        slot.save()
+
+        serializer = AppointmentSerializer(appointment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class DoctorScheduleViewSet(viewsets.ModelViewSet):
     queryset = DoctorSchedule.objects.all()
     serializer_class = DoctorScheduleSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     # opcional: filtrar por doctor usando query param
     def get_queryset(self):

@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'api',
+    'django_q',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,14 @@ REST_FRAMEWORK = {
 }
 
 AUTH_USER_MODEL = "api.Patient"
+
+Q_CLUSTER = {
+    'name': 'DjangoQ',
+    'workers': 2,
+    'recycle': 500,
+    'timeout': 60,
+    'retry': 120,
+    'queue_limit': 50,
+    'bulk': 10,
+    'orm': 'default',  # usa la base de datos de Django
+}

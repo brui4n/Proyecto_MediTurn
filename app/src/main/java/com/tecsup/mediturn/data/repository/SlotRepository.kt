@@ -9,7 +9,7 @@ class SlotRepository(private val api: SlotApi) {
         return api.getSlots()
     }
 
-    suspend fun getSlotById(id: Int): Slot {
-        return api.getSlot(id)
+    suspend fun getSlotsByDoctor(doctorId: Int): List<Slot> {
+        return api.getSlotsByDoctor(doctorId)
     }
 }

@@ -165,7 +165,7 @@ fun DoctorDetailScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Button(
-                            onClick = { navController.navigate(Routes.Appointment.route) },
+                            onClick = { navController.navigate("${Routes.Appointment.route}/${doctor.id}")  },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(46.dp),
