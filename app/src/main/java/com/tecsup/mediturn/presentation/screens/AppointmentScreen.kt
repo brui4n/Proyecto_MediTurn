@@ -151,7 +151,7 @@ fun AppointmentScreen(
             slotsState.forEach { Log.d("DEBUG_SLOT", "slot.date=${it.date}") }
 
             val slotsForDate = slotsState.filter { slot ->
-                slot.date?.trim() == selectedDate.trim()
+                slot.date.trim() == selectedDate.trim()
             }
 
             Text("Hora de la cita *", fontWeight = FontWeight.SemiBold)
