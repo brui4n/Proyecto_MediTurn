@@ -33,7 +33,7 @@ fun LoginScreen(
     val loggedInUser by loginViewModel.loggedInUser
     val isLoading by loginViewModel.isLoading
 
-    // 🔹 Efecto: si hay sesión cargada o login exitoso → ir al Home
+    // Efecto: si hay sesión cargada o login exitoso → ir al Home
     LaunchedEffect(loggedInUser) {
         if (loggedInUser != null) {
             navController.navigate(Routes.Home.route) {
@@ -42,7 +42,7 @@ fun LoginScreen(
         }
     }
 
-    // 🔹 Efecto: cargar sesión previa al iniciar pantalla
+    // Efecto: cargar sesión previa al iniciar pantalla
     LaunchedEffect(Unit) {
         loginViewModel.loadSession()
     }
@@ -51,7 +51,7 @@ fun LoginScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.TopCenter
     ) {
 
         Column(
@@ -64,7 +64,7 @@ fun LoginScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(250.dp)
+                    .height(280.dp)
                     .shadow(4.dp, RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                     .background(
                         Brush.verticalGradient(colors = BackgroundGradient),
@@ -175,15 +175,6 @@ fun LoginScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                TextButton(onClick = { /* TODO: recuperar contraseña */ }) {
-                    Text(
-                        text = "¿Olvidaste tu contraseña?",
-                        color = BluePrimary,
-                        fontSize = 14.sp
-                    )
-                }
 
                 Spacer(modifier = Modifier.height(12.dp))
 

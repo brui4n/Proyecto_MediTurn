@@ -37,7 +37,7 @@ class PatientViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]
 
 class SlotViewSet(viewsets.ModelViewSet):
-    queryset = Slot.objects.all()  # ✅ agrega esta línea
+    queryset = Slot.objects.all()  
     serializer_class = SlotSerializer
 
     def get_queryset(self):
@@ -65,7 +65,7 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         qs = super().get_queryset().select_related('doctor', 'patient', 'slot')
         patient_id = self.request.query_params.get('patient')
-        scope = self.request.query_params.get('scope')  # 'upcoming' | 'past'
+        scope = self.request.query_params.get('scope') 
 
         if patient_id:
             qs = qs.filter(patient_id=patient_id)
