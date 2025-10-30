@@ -18,6 +18,9 @@ sealed class Routes (val route: String){
     object Appointment : Routes("appointment")
     object Payment : Routes("payment")
     object PaymentSummary : Routes("payment_summary")
+    object CityFilter : Routes("city_filter")
+
+    object DoctorDetail: Routes("doctor")
 
 
 

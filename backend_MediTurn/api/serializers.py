@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Doctor, Patient, Slot, Appointment, DoctorRating
+from .models import Doctor, Patient, Slot, Appointment, DoctorRating, DoctorSchedule
 
 class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -29,3 +29,10 @@ class DoctorRatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoctorRating
         fields = '__all__'
+
+class DoctorScheduleSerializer(serializers.ModelSerializer):
+    weekday_name = serializers.CharField(source='get_weekday_display', read_only=True)
+    
+    class Meta:
+        model = DoctorSchedule
+        fields = ['id', 'doctor', 'weekday', 'weekday_name', 'start_time', 'end_time']

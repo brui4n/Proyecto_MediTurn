@@ -19,6 +19,8 @@ class DoctorViewModel(application: Application) : AndroidViewModel(application) 
     )
 
     private val _doctors = MutableStateFlow<Resource<List<Doctor>>>(Resource.Loading())
+    private val _doctorDetail = MutableStateFlow<Resource<Doctor>>(Resource.Loading())
+    val doctorDetail: StateFlow<Resource<Doctor>> = _doctorDetail
     val doctors: StateFlow<Resource<List<Doctor>>> = _doctors
 
     fun loadDoctorsBySpecialty(specialty: String) {
@@ -42,4 +44,15 @@ class DoctorViewModel(application: Application) : AndroidViewModel(application) 
             }
         }
     }
+    fun loadDoctorById(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = doctorRepository.getDoctorById(id)
+                _doctorDetail.value = Resource.Success(response)
+            } catch (e: Exception) {
+                _doctorDetail.value = Resource.Error(e.localizedMessage ?: "Error al obtener doctor")
+            }
+        }
+    }
+
 }

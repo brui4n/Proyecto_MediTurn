@@ -3,6 +3,7 @@ package com.tecsup.mediturn.presentation.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.tecsup.mediturn.navigation.Routes
 import com.tecsup.mediturn.presentation.components.DoctorCard
 import com.tecsup.mediturn.ui.theme.BluePrimary
 import com.tecsup.mediturn.ui.theme.GreenAccent
@@ -32,6 +34,7 @@ fun DoctorListScreen(
     viewModel: DoctorViewModel = viewModel()
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var selectedCity by remember { mutableStateOf<String?>(null) }
 
     // Observar el estado desde el ViewModel
     val doctorState by viewModel.doctors.collectAsState()
@@ -102,7 +105,7 @@ fun DoctorListScreen(
                 )
             }
         },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -123,22 +126,56 @@ fun DoctorListScreen(
 
                 is Resource.Success -> {
                     val doctors = doctorState.data ?: emptyList()
+                    val cities = remember(doctors) {
+                        doctors.mapNotNull { it.city?.takeIf { c -> c.isNotBlank() } }.distinct().sorted()
+                    }
                     Text(
                         text = "${doctors.size} médicos encontrados",
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
                     Spacer(modifier = Modifier.height(12.dp))
+
+                    if (cities.isNotEmpty()) {
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            item {
+                                OutlinedButton(
+                                    onClick = { selectedCity = null },
+                                    shape = MaterialTheme.shapes.large,
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        containerColor = if (selectedCity == null) BluePrimary else MaterialTheme.colorScheme.surface,
+                                        contentColor = if (selectedCity == null) Color.White else MaterialTheme.colorScheme.onSurface
+                                    )
+                                ) { Text("Todas") }
+                            }
+                            items(cities) { city ->
+                                OutlinedButton(
+                                    onClick = { selectedCity = city },
+                                    shape = MaterialTheme.shapes.large,
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        containerColor = if (selectedCity == city) BluePrimary else MaterialTheme.colorScheme.surface,
+                                        contentColor = if (selectedCity == city) Color.White else MaterialTheme.colorScheme.onSurface
+                                    )
+                                ) { Text(city) }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    val visibleDoctors = remember(doctors, selectedCity) {
+                        if (selectedCity.isNullOrBlank()) doctors else doctors.filter { it.city.equals(selectedCity, true) }
+                    }
+
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(14.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(doctors) { doctor ->
+                        items(visibleDoctors) { doctor ->
                             DoctorCard(
                                 doctor = doctor,
-                                onDetailClick = {
-                                    navController.navigate("doctor_detail/${doctor.id}")
-                                }
+                                onDetailClick = rememberUpdatedState {
+                                    navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
+                                }.value
                             )
                         }
                     }

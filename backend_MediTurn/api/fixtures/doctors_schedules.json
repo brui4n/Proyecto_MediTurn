@@ -1,0 +1,286 @@
+[
+  {
+    "model": "api.doctorschedule",
+    "pk": 1,
+    "fields": { "doctor": 1, "weekday": 0, "start_time": "09:00", "end_time": "17:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 2,
+    "fields": { "doctor": 1, "weekday": 2, "start_time": "10:00", "end_time": "14:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 3,
+    "fields": { "doctor": 1, "weekday": 4, "start_time": "13:00", "end_time": "18:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 4,
+    "fields": { "doctor": 2, "weekday": 1, "start_time": "08:00", "end_time": "16:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 5,
+    "fields": { "doctor": 2, "weekday": 3, "start_time": "08:00", "end_time": "12:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 6,
+    "fields": { "doctor": 2, "weekday": 5, "start_time": "09:00", "end_time": "13:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 7,
+    "fields": { "doctor": 3, "weekday": 0, "start_time": "14:00", "end_time": "20:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 8,
+    "fields": { "doctor": 3, "weekday": 2, "start_time": "09:00", "end_time": "15:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 9,
+    "fields": { "doctor": 3, "weekday": 5, "start_time": "10:00", "end_time": "14:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 10,
+    "fields": { "doctor": 4, "weekday": 1, "start_time": "07:00", "end_time": "13:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 11,
+    "fields": { "doctor": 4, "weekday": 3, "start_time": "08:00", "end_time": "14:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 12,
+    "fields": { "doctor": 4, "weekday": 4, "start_time": "09:00", "end_time": "17:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 13,
+    "fields": { "doctor": 5, "weekday": 2, "start_time": "09:00", "end_time": "13:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 14,
+    "fields": { "doctor": 5, "weekday": 3, "start_time": "10:00", "end_time": "18:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 15,
+    "fields": { "doctor": 5, "weekday": 5, "start_time": "09:00", "end_time": "14:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 16,
+    "fields": { "doctor": 6, "weekday": 0, "start_time": "08:30", "end_time": "12:30" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 17,
+    "fields": { "doctor": 6, "weekday": 2, "start_time": "13:00", "end_time": "17:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 18,
+    "fields": { "doctor": 6, "weekday": 4, "start_time": "08:00", "end_time": "16:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 19,
+    "fields": { "doctor": 7, "weekday": 1, "start_time": "09:00", "end_time": "15:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 20,
+    "fields": { "doctor": 7, "weekday": 3, "start_time": "10:00", "end_time": "18:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 21,
+    "fields": { "doctor": 7, "weekday": 6, "start_time": "09:00", "end_time": "13:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 22,
+    "fields": { "doctor": 8, "weekday": 0, "start_time": "08:00", "end_time": "14:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 23,
+    "fields": { "doctor": 8, "weekday": 2, "start_time": "08:30", "end_time": "12:30" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 24,
+    "fields": { "doctor": 8, "weekday": 4, "start_time": "09:00", "end_time": "17:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 25,
+    "fields": { "doctor": 9, "weekday": 1, "start_time": "14:00", "end_time": "20:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 26,
+    "fields": { "doctor": 9, "weekday": 3, "start_time": "09:00", "end_time": "15:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 27,
+    "fields": { "doctor": 9, "weekday": 5, "start_time": "10:00", "end_time": "14:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 28,
+    "fields": { "doctor": 10, "weekday": 0, "start_time": "08:00", "end_time": "12:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 29,
+    "fields": { "doctor": 10, "weekday": 2, "start_time": "13:00", "end_time": "19:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 30,
+    "fields": { "doctor": 10, "weekday": 4, "start_time": "09:00", "end_time": "15:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 31,
+    "fields": { "doctor": 11, "weekday": 1, "start_time": "09:00", "end_time": "13:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 32,
+    "fields": { "doctor": 11, "weekday": 3, "start_time": "10:00", "end_time": "16:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 33,
+    "fields": { "doctor": 12, "weekday": 0, "start_time": "08:00", "end_time": "12:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 34,
+    "fields": { "doctor": 12, "weekday": 2, "start_time": "09:00", "end_time": "17:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 35,
+    "fields": { "doctor": 12, "weekday": 4, "start_time": "10:00", "end_time": "15:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 36,
+    "fields": { "doctor": 13, "weekday": 1, "start_time": "13:00", "end_time": "19:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 37,
+    "fields": { "doctor": 13, "weekday": 5, "start_time": "08:00", "end_time": "13:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 38,
+    "fields": { "doctor": 14, "weekday": 0, "start_time": "09:00", "end_time": "15:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 39,
+    "fields": { "doctor": 14, "weekday": 2, "start_time": "08:00", "end_time": "12:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 40,
+    "fields": { "doctor": 15, "weekday": 3, "start_time": "09:00", "end_time": "17:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 41,
+    "fields": { "doctor": 15, "weekday": 5, "start_time": "08:00", "end_time": "14:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 42,
+    "fields": { "doctor": 16, "weekday": 1, "start_time": "08:00", "end_time": "12:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 43,
+    "fields": { "doctor": 16, "weekday": 3, "start_time": "14:00", "end_time": "18:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 44,
+    "fields": { "doctor": 16, "weekday": 5, "start_time": "09:00", "end_time": "13:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 45,
+    "fields": { "doctor": 17, "weekday": 0, "start_time": "10:00", "end_time": "18:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 46,
+    "fields": { "doctor": 17, "weekday": 2, "start_time": "09:00", "end_time": "15:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 47,
+    "fields": { "doctor": 18, "weekday": 1, "start_time": "08:00", "end_time": "16:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 48,
+    "fields": { "doctor": 18, "weekday": 4, "start_time": "09:00", "end_time": "13:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 49,
+    "fields": { "doctor": 19, "weekday": 2, "start_time": "09:00", "end_time": "15:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 50,
+    "fields": { "doctor": 19, "weekday": 4, "start_time": "13:00", "end_time": "19:00" }
+  },
+
+  {
+    "model": "api.doctorschedule",
+    "pk": 51,
+    "fields": { "doctor": 20, "weekday": 0, "start_time": "08:00", "end_time": "12:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 52,
+    "fields": { "doctor": 20, "weekday": 2, "start_time": "09:00", "end_time": "17:00" }
+  },
+  {
+    "model": "api.doctorschedule",
+    "pk": 53,
+    "fields": { "doctor": 20, "weekday": 5, "start_time": "10:00", "end_time": "14:00" }
+  }
+]

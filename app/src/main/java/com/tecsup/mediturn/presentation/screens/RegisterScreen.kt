@@ -49,13 +49,13 @@ fun RegisterScreen(
             .background(Color.White)
             .verticalScroll(rememberScrollState())
     ) {
-        // Encabezado (igual que antes)
+        // Encabezado con degradado azul–verde
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
                 .background(
-                    Brush.verticalGradient(colors = listOf(GreenAccent, GreenDark)),
+                    Brush.verticalGradient(colors = BackgroundGradient),
                     shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
                 )
                 .padding(horizontal = 24.dp, vertical = 16.dp),

@@ -22,9 +22,25 @@ import androidx.compose.material.icons.filled.AccessTime
 import androidx.navigation.NavController
 import com.tecsup.mediturn.navigation.Routes
 import com.tecsup.mediturn.presentation.components.BottomBar
+import androidx.compose.ui.platform.LocalContext
+import com.tecsup.mediturn.data.remote.RetrofitInstance
+import com.tecsup.mediturn.data.repository.AppointmentRepository
+import com.tecsup.mediturn.data.repository.SlotRepository
+import com.tecsup.mediturn.data.session.SessionManager
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.verticalScroll
+import kotlinx.coroutines.flow.firstOrNull
+import java.time.LocalTime
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import com.tecsup.mediturn.ui.theme.BluePrimary
 
 data class Cita(
+    val appointmentId: Int,
+    val doctorId: Int,
     val doctor: String,
     val especialidad: String,
     val fecha: String,
@@ -36,16 +52,62 @@ data class Cita(
 fun CitasScreen(navController: NavController) {
 
     var selectedTab by remember { mutableStateOf(0) } // 0 = próximas, 1 = historial
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val session = remember { SessionManager(context) }
+    val repo = remember { AppointmentRepository(RetrofitInstance.appointmentApi(context)) }
+    val slotRepo = remember { SlotRepository(RetrofitInstance.slotApi(context)) }
 
-    val proximasCitas = listOf(
-        Cita("Dra. María González", "Cardiología", "25/10/2025", "10:00 AM", "DMG"),
-        Cita("Dr. Carlos Ramírez", "Neurología", "28/10/2025", "03:30 PM", "DCR")
-    )
+    var proximasCitas by remember { mutableStateOf<List<Cita>>(emptyList()) }
+    var historialCitas by remember { mutableStateOf<List<Cita>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var errorText by remember { mutableStateOf<String?>(null) }
+    var openCancelDialog by remember { mutableStateOf<Cita?>(null) }
+    var openRescheduleFor by remember { mutableStateOf<Cita?>(null) }
+    var availableSlots by remember { mutableStateOf<List<com.tecsup.mediturn.data.model.Slot>>(emptyList()) }
+    var selectedDate by remember { mutableStateOf("") }
+    var selectedSlotId by remember { mutableStateOf<Int?>(null) }
 
-    val historialCitas = listOf(
-        Cita("Dr. Juan Pérez", "Pediatría", "10/09/2025", "09:00 AM", "DJP"),
-        Cita("Dra. Ana Torres", "Dermatología", "20/08/2025", "11:30 AM", "DAT")
-    )
+    LaunchedEffect(true) {
+        scope.launch {
+            try {
+                isLoading = true
+                val user = session.userSession.first() ?: return@launch
+                val upcoming = repo.getAppointmentsByPatient(user.id, scope = "upcoming")
+                val past = repo.getAppointmentsByPatient(user.id, scope = "past")
+
+                val hourFormatter24 = DateTimeFormatter.ofPattern("HH:mm")
+                val hourFormatter12 = DateTimeFormatter.ofPattern("hh:mm a")
+
+                fun mapToCita(a: com.tecsup.mediturn.data.model.Appointment): Cita {
+                    val initials = a.doctor.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }
+                        .joinToString("")
+                        .take(3)
+                        .uppercase()
+                    val datePieces = a.slot.date.split("-")
+                    val fecha = "${datePieces[2]}/${datePieces[1]}/${datePieces[0]}"
+                    val hora = try { LocalTime.parse(a.slot.time.substring(0,5), hourFormatter24).format(hourFormatter12) } catch (_: Exception) { a.slot.time }
+                    return Cita(
+                        appointmentId = a.id,
+                        doctorId = a.doctor.id,
+                        doctor = a.doctor.name,
+                        especialidad = a.doctor.specialty,
+                        fecha = fecha,
+                        hora = hora,
+                        iniciales = initials
+                    )
+                }
+
+                proximasCitas = upcoming.map(::mapToCita)
+                historialCitas = past.map(::mapToCita)
+                errorText = null
+            } catch (e: Exception) {
+                errorText = e.message
+            } finally {
+                isLoading = false
+            }
+        }
+    }
 
     val citas = if (selectedTab == 0) proximasCitas else historialCitas
 
@@ -56,7 +118,7 @@ fun CitasScreen(navController: NavController) {
                 currentRoute = Routes.Citas.route
             )
         },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -66,51 +128,208 @@ fun CitasScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                "Mis citas",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 🔹 Tabs
-            TabRow(
-                selectedTabIndex = selectedTab,
-                containerColor = Color(0xFFEFF3F8),
-                indicator = {},
-                divider = {}
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(12.dp)
             ) {
-                listOf("Próximas (${proximasCitas.size})", "Historial (${historialCitas.size})").forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = {
-                            Text(
-                                title,
-                                color = if (selectedTab == index) Color.White else Color.DarkGray,
-                                fontWeight = if (selectedTab == index) FontWeight.SemiBold else FontWeight.Normal
-                            )
-                        },
-                        modifier = Modifier
-                            .background(
-                                if (selectedTab == index) BluePrimary else Color.Transparent,
-                                RoundedCornerShape(50)
-                            )
-                            .padding(horizontal = 16.dp, vertical = 6.dp)
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        "Mis citas",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // 🔹 Tabs
+                    TabRow(
+                        selectedTabIndex = selectedTab,
+                        containerColor = Color.Transparent,
+                        indicator = {},
+                        divider = {}
+                    ) {
+                        listOf("Próximas (${proximasCitas.size})", "Historial (${historialCitas.size})").forEachIndexed { index, title ->
+                            Tab(
+                                selected = selectedTab == index,
+                                onClick = { selectedTab = index },
+                                text = {
+                                    Text(
+                                        title,
+                                        color = if (selectedTab == index) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                                        fontWeight = if (selectedTab == index) FontWeight.SemiBold else FontWeight.Normal
+                                    )
+                                },
+                                modifier = Modifier
+                                    .background(
+                                        if (selectedTab == index) BluePrimary else Color.Transparent,
+                                        RoundedCornerShape(50)
+                                    )
+                                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // 🔹 Lista de citas
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(citas) { cita ->
-                    CitaCard(cita)
+            if (isLoading) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = BluePrimary)
                 }
+            } else if (errorText != null) {
+                Text("Error: $errorText", color = Color(0xFFB00020))
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(citas) { cita ->
+                        CitaCard(
+                            cita = cita,
+                            showActions = selectedTab == 0,
+                            onCancel = { selected ->
+                                // Confirmar cancelación
+                                openCancelDialog = selected
+                            },
+                            onReschedule = { selected ->
+                                openRescheduleFor = selected
+                                // cargar slots disponibles del doctor
+                                scope.launch {
+                                    try {
+                                        val slots = slotRepo.getSlotsByDoctor(selected.doctorId)
+                                        availableSlots = slots.filter { it.available }
+                                        val today = LocalDate.now()
+                                        val firstFuture = availableSlots
+                                            .map { LocalDate.parse(it.date) to it.date }
+                                            .filter { (ld, _) -> !ld.isBefore(today) }
+                                            .minByOrNull { it.first }?.second
+                                        selectedDate = firstFuture ?: ""
+                                        selectedSlotId = null
+                                    } catch (e: Exception) {
+                                        errorText = e.message
+                                    }
+                                }
+                            }
+                        )
+                    }
+                }
+            }
+
+            // Dialogo de cancelar
+            openCancelDialog?.let { c ->
+                AlertDialog(
+                    onDismissRequest = { openCancelDialog = null },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            scope.launch {
+                                try {
+                                    repo.cancelAppointment(c.appointmentId)
+                                    // refrescar listas
+                                    val user = session.userSession.firstOrNull() ?: return@launch
+                                    val upcoming = repo.getAppointmentsByPatient(user.id, scope = "upcoming")
+                                    val past = repo.getAppointmentsByPatient(user.id, scope = "past")
+                                    val hourFormatter24 = DateTimeFormatter.ofPattern("HH:mm")
+                                    val hourFormatter12 = DateTimeFormatter.ofPattern("hh:mm a")
+                                    fun mapToCitaLocal(a: com.tecsup.mediturn.data.model.Appointment): Cita {
+                                        val initials = a.doctor.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }
+                                            .joinToString("").take(3).uppercase()
+                                        val parts = a.slot.date.split("-")
+                                        val fecha = "${parts[2]}/${parts[1]}/${parts[0]}"
+                                        val hora = try { LocalTime.parse(a.slot.time.substring(0,5), hourFormatter24).format(hourFormatter12) } catch (_: Exception) { a.slot.time }
+                                        return Cita(a.id, a.doctor.id, a.doctor.name, a.doctor.specialty, fecha, hora, initials)
+                                    }
+                                    proximasCitas = upcoming.map(::mapToCitaLocal)
+                                    historialCitas = past.map(::mapToCitaLocal)
+                                } finally { openCancelDialog = null }
+                            }
+                        }) { Text("Sí, cancelar") }
+                    },
+                    dismissButton = { TextButton(onClick = { openCancelDialog = null }) { Text("No") } },
+                    title = { Text("Cancelar cita") },
+                    text = { Text("¿Deseas cancelar tu cita con ${c.doctor}?") }
+                )
+            }
+
+            // Dialogo de reprogramar
+            openRescheduleFor?.let { c ->
+                val today = LocalDate.now()
+                val dates = availableSlots
+                    .map { LocalDate.parse(it.date) }
+                    .filter { !it.isBefore(today) }
+                    .distinct()
+                    .sorted()
+                    .map { it.toString() }
+                val slotsForDate = availableSlots.filter { it.date == selectedDate }
+                AlertDialog(
+                    onDismissRequest = { openRescheduleFor = null },
+                    confirmButton = {
+                        TextButton(onClick = {
+                            val slotId = selectedSlotId
+                            if (slotId != null) {
+                                scope.launch {
+                                    try {
+                                        repo.rescheduleAppointment(c.appointmentId, slotId)
+                                        val user = session.userSession.firstOrNull() ?: return@launch
+                                        val upcoming = repo.getAppointmentsByPatient(user.id, scope = "upcoming")
+                                        val past = repo.getAppointmentsByPatient(user.id, scope = "past")
+                                        val hourFormatter24 = DateTimeFormatter.ofPattern("HH:mm")
+                                        val hourFormatter12 = DateTimeFormatter.ofPattern("hh:mm a")
+                                        fun mapToCitaLocal(a: com.tecsup.mediturn.data.model.Appointment): Cita {
+                                            val initials = a.doctor.name.split(" ").mapNotNull { it.firstOrNull()?.toString() }
+                                                .joinToString("").take(3).uppercase()
+                                            val parts = a.slot.date.split("-")
+                                            val fecha = "${parts[2]}/${parts[1]}/${parts[0]}"
+                                            val hora = try { LocalTime.parse(a.slot.time.substring(0,5), hourFormatter24).format(hourFormatter12) } catch (_: Exception) { a.slot.time }
+                                            return Cita(a.id, a.doctor.id, a.doctor.name, a.doctor.specialty, fecha, hora, initials)
+                                        }
+                                        proximasCitas = upcoming.map(::mapToCitaLocal)
+                                        historialCitas = past.map(::mapToCitaLocal)
+                                    } finally { openRescheduleFor = null }
+                                }
+                            }
+                        }) { Text("Confirmar") }
+                    },
+                    dismissButton = { TextButton(onClick = { openRescheduleFor = null }) { Text("Cerrar") } },
+                    title = { Text("Reprogramar cita") },
+                    text = {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                            Text("Selecciona fecha")
+                            Spacer(Modifier.height(8.dp))
+                            // fechas (envolver en múltiples líneas)
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                dates.forEach { d ->
+                                    val isSelected = d == selectedDate
+                                    OutlinedButton(
+                                        onClick = { selectedDate = d; selectedSlotId = null },
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            containerColor = if (isSelected) BluePrimary else Color.White,
+                                            contentColor = if (isSelected) Color.White else Color.Black
+                                        ),
+                                        shape = RoundedCornerShape(50)
+                                    ) { Text(d) }
+                                }
+                            }
+                            Spacer(Modifier.height(12.dp))
+                            Text("Selecciona hora")
+                            Spacer(Modifier.height(8.dp))
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                slotsForDate.forEach { s ->
+                                    val isSelected = selectedSlotId == s.id
+                                    OutlinedButton(
+                                        onClick = { selectedSlotId = s.id },
+                                        colors = ButtonDefaults.outlinedButtonColors(
+                                            containerColor = if (isSelected) BluePrimary else Color.White,
+                                            contentColor = if (isSelected) Color.White else Color.Black
+                                        ),
+                                        shape = RoundedCornerShape(50)
+                                    ) { Text(s.time.take(5)) }
+                                }
+                            }
+                        }
+                    }
+                )
             }
         }
     }
@@ -118,10 +337,15 @@ fun CitasScreen(navController: NavController) {
 
 
 @Composable
-fun CitaCard(cita: Cita) {
+fun CitaCard(
+    cita: Cita,
+    showActions: Boolean,
+    onCancel: (Cita) -> Unit,
+    onReschedule: (Cita) -> Unit
+) {
     Card(
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -145,8 +369,8 @@ fun CitaCard(cita: Cita) {
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
-                    Text(cita.doctor, fontWeight = FontWeight.Bold)
-                    Text(cita.especialidad, color = Color.Gray)
+                    Text(cita.doctor, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(cita.especialidad, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f))
                 }
             }
 
@@ -157,9 +381,22 @@ fun CitaCard(cita: Cita) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(Icons.Default.DateRange, contentDescription = null, tint = BluePrimary)
-                Text(cita.fecha)
+                Text(cita.fecha, color = MaterialTheme.colorScheme.onSurface)
                 Icon(Icons.Default.AccessTime, contentDescription = null, tint = BluePrimary)
-                Text(cita.hora)
+                Text(cita.hora, color = MaterialTheme.colorScheme.onSurface)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            if (showActions) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = { onReschedule(cita) }) {
+                        Text("Reprogramar")
+                    }
+                    OutlinedButton(onClick = { onCancel(cita) }, colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFB00020))) {
+                        Text("Cancelar")
+                    }
+                }
             }
         }
     }

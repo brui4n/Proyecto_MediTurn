@@ -1,6 +1,7 @@
 package com.tecsup.mediturn.data.remote
 
 import android.content.Context
+import com.tecsup.mediturn.data.model.DoctorSchedule
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -55,4 +56,7 @@ object RetrofitInstance {
 
     fun appointmentApi(context: Context): AppointmentApi =
         getRetrofitInstance(context).create(AppointmentApi::class.java)
+
+    fun doctorScheduleApi(context: Context): DoctorScheduleApi =
+        getRetrofitInstance(context).create(DoctorScheduleApi::class.java)
 }

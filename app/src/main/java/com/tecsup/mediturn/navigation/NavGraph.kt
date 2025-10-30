@@ -47,11 +47,48 @@ fun NavGraph() {
             DoctorListScreen(navController = navController, specialty = specialty)
         }
 
+        composable(
+            route = Routes.DoctorDetail.route + "/{doctorId}",
+            arguments = listOf(navArgument("doctorId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getInt("doctorId") ?: 0
+            DoctorDetailScreen(navController = navController, doctorId = doctorId)
+        }
+
+        composable(
+            route = Routes.Appointment.route + "/{doctorId}",
+            arguments = listOf(navArgument("doctorId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getInt("doctorId") ?: 0
+            AppointmentScreen(navController = navController, doctorId = doctorId)
+        }
 
 
-        // Otras pantallas
-        composable(Routes.Appointment.route) { AppointmentScreen(navController) }
-        composable(Routes.Payment.route) { PaymentScreen(navController) }
-        composable(Routes.PaymentSummary.route) { PaymentSummaryScreen(navController) }
+
+
+
+        composable(
+            route = Routes.Payment.route + "/{doctorId}/{slotId}/{type}",
+            arguments = listOf(
+                navArgument("doctorId") { type = NavType.IntType },
+                navArgument("slotId") { type = NavType.IntType },
+                navArgument("type") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val doctorId = backStackEntry.arguments?.getInt("doctorId") ?: 0
+            val slotId = backStackEntry.arguments?.getInt("slotId") ?: 0
+            val type = backStackEntry.arguments?.getString("type") ?: "PRESENCIAL"
+            PaymentScreen(navController, doctorId, slotId, type)
+        }
+        composable(
+            route = Routes.PaymentSummary.route + "/{appointmentId}",
+            arguments = listOf(navArgument("appointmentId") { type = NavType.IntType })
+        ) { backStackEntry ->
+            val appointmentId = backStackEntry.arguments?.getInt("appointmentId") ?: 0
+            PaymentSummaryScreen(navController, appointmentId)
+        }
+
+        // Filtro por ciudad (sin buscador)
+        composable(Routes.CityFilter.route) { CityFilterScreen(navController) }
     }
 }

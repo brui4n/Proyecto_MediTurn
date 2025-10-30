@@ -6,7 +6,9 @@ from .views import (
     SlotViewSet,
     AppointmentViewSet,
     login_patient,  
-    register_patient
+    register_patient,
+    change_password,
+    DoctorScheduleViewSet
 )
 from django.conf import settings
 from django.conf.urls.static import static
@@ -17,11 +19,13 @@ router.register(r'doctors', DoctorViewSet)
 router.register(r'patients', PatientViewSet)
 router.register(r'slots', SlotViewSet)
 router.register(r'appointments', AppointmentViewSet)
+router.register(r'doctor-schedules', DoctorScheduleViewSet)
 
 
 urlpatterns = [
     path('login/', login_patient, name='login_patient'),
     path('register/', register_patient, name='register_patient'),
+    path('change-password/', change_password, name='change_password'),
 
 ]
 
