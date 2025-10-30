@@ -88,7 +88,7 @@ com.tecsup.mediturn <br>
 
 ## 🎨 Prototipo en Figma
 
-📎 Enlace al diseño: [Figma]([https://www.figma.com/make/ndETWppBQuz1Z7Q8LpdmD8/MediTurn-Mobile-App-Prototype?node-id=0-1&t=8vPChdFO6xze56WZ-1](https://ivory-folder-15860280.figma.site))
+📎 Enlace al diseño: [Figma](https://ivory-folder-15860280.figma.site)  
 
 ---
 
