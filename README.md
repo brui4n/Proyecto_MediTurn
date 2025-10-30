@@ -3,7 +3,7 @@
 **Curso:** Programacion en Móviles (Kotlin + Jetpack Compose)  
 **Docente:** Juan León  
 **Duración:** 6 días  
-**Modalidad:** Trabajo colaborativo (2–3 integrantes)  
+**Modalidad:** Trabajo colaborativo (3 integrantes)  
 
 ---
 
@@ -38,28 +38,41 @@ El objetivo es ofrecer una experiencia moderna, rápida y organizada para la **g
 
 ## 🧩 Arquitectura base
 
-El proyecto está desarrollado siguiendo el patrón **MVVM (Model–View–ViewModel)** y la arquitectura modular:
-com.coronel.mediturn <br>
+El proyecto sigue el patrón MVVM (Model–View–ViewModel), combinando consumo de API REST (Django + Retrofit) con una organización modular clara: <br>
 
-├── data        → manejo de datos locales (Room / JSON) <br>
-├── repository  → capa de repositorio e intermediación de datos <br>
-├── viewmodel   → lógica de negocio y estados de UI <br>
-├── presentation → pantallas y navegación principal <br>
-├── ui          → temas, colores, tipografía <br>
-└── navigation  → rutas y NavHost <br>
-
----
-
+com.tecsup.mediturn <br>
+├── data <br>
+│   ├── model          → Modelos de datos (Doctor, Appointment, Patient, etc.) <br>
+│   ├── remote         → Conexión con el backend (Retrofit, Endpoints, DTOs, AuthInterceptor) <br>
+│   ├── repository     → Intermediarios entre ViewModels y capa remota (lógica de red y manejo de errores) <br>
+│   └── session        → Gestión de sesión y token del usuario <br>
+│
+├── presentation <br>
+│   ├── screens        → Pantallas principales (Login, Registro, Home, Citas, etc.) <br>
+│   ├── components     → Componentes reutilizables (BottomBar, DoctorCard, etc.) <br>
+│   └── MainActivity.kt → Contenedor principal del flujo de navegación <br>
+│
+├── viewmodel          → Manejo de estados, peticiones y lógica de negocio (uno por entidad principal) <br>
+│
+├── navigation          → Definición de rutas y NavHost <br>
+│
+├── ui/theme            → Definición de colores, tipografía y estilos globales <br>
+│
+└── util                → Utilidades compartidas (Constantes, envoltorio Resource) <br>
 ## 🛠️ Tecnologías utilizadas
 
-- **Lenguaje:** Kotlin  
-- **Framework:** Jetpack Compose  
-- **Arquitectura:** MVVM  
-- **Navegación:** Navigation Compose  
-- **Base de datos (opcional):** Room o JSON simulado  
-- **Diseño:** Figma  
-- **Control de versiones:** Git / GitHub
-
+	•	Lenguaje: Kotlin
+	•	Framework: Jetpack Compose (Material 3)
+	•	Arquitectura: MVVM (Model–View–ViewModel)
+	•	Consumo de API: Retrofit + Gson Converter
+	•	Backend: Django REST Framework
+	•	Base de datos del backend: SQLite (predeterminada de Django)
+	•	Gestión de sesión: SharedPreferences mediante SessionManager
+	•	Navegación: Navigation Compose
+	•	Diseño: Figma
+	•	Control de versiones: Git / GitHub
+	•	Testing: JUnit + pruebas instrumentadas (Android Test)
+	•	Configuración de red: network_security_config.xml para conexión con backend local o remoto
 ---
 
 ## 🧠 Historias de usuario (provisionales)
@@ -75,7 +88,7 @@ com.coronel.mediturn <br>
 
 ## 🎨 Prototipo en Figma
 
-📎 Enlace al diseño: [Figma](https://www.figma.com/make/ndETWppBQuz1Z7Q8LpdmD8/MediTurn-Mobile-App-Prototype?node-id=0-1&t=8vPChdFO6xze56WZ-1)
+📎 Enlace al diseño: [Figma]([https://www.figma.com/make/ndETWppBQuz1Z7Q8LpdmD8/MediTurn-Mobile-App-Prototype?node-id=0-1&t=8vPChdFO6xze56WZ-1](https://ivory-folder-15860280.figma.site))
 
 ---
 
@@ -103,6 +116,6 @@ com.coronel.mediturn <br>
 ✅ Proyecto base creado en Android Studio  
 ✅ Estructura de paquetes organizada <br>
 ✅ Primer diseño en figma <br>
-🕓 Pendiente: (Día 4-5)
+🕓 Pendiente: (PR sobre la version 1.0)
 
 ---
