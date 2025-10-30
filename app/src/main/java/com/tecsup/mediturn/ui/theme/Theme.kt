@@ -15,18 +15,21 @@ private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
     tertiary = Pink80,
-    background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E),
-    surfaceVariant = Color(0xFF2A2A2A)
+    // Oscuro agradable (no negro puro)
+    background = Color(0xFF161A20),
+    surface = Color(0xFF1B212A),
+    surfaceVariant = Color(0xFF242C37),
+    onBackground = Color(0xFFE8ECF2),
+    onSurface = Color(0xFFE8ECF2)
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    background = Color(0xFFF8F9FA),
+    background = Color(0xFFF7F9FC),
     surface = Color(0xFFFFFFFF),
-    surfaceVariant = Color(0xFFE8F0FE)
+    surfaceVariant = Color(0xFFF0F4FA)
 )
 
 @Composable

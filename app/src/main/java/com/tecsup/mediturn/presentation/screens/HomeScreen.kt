@@ -1,9 +1,11 @@
 package com.tecsup.mediturn.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -77,6 +79,19 @@ fun HomeScreen(navController: NavController,
         "Medicina General" to "🩺",
         "Pediatría" to "👶"
     )
+
+    // Filtro por ciudad
+    var selectedCity by remember { mutableStateOf<String?>(null) } // null = todas
+    val cities = remember(doctorsFiltered) {
+        doctorsFiltered.mapNotNull { it.city?.takeIf { c -> c.isNotBlank() } }
+            .distinct()
+            .sorted()
+    }
+
+    val visibleDoctors = remember(doctorsFiltered, selectedCity) {
+        if (selectedCity.isNullOrBlank()) doctorsFiltered
+        else doctorsFiltered.filter { it.city.equals(selectedCity, ignoreCase = true) }
+    }
     // Próxima cita del paciente
     val repo = remember { AppointmentRepository(RetrofitInstance.appointmentApi(context)) }
     var nextDoctor by remember { mutableStateOf<String?>(null) }
@@ -158,7 +173,7 @@ fun HomeScreen(navController: NavController,
                                 onClick = { expanded = true },
                                 modifier = Modifier
                                     .size(40.dp)
-                                    .background(WhiteTransparent, CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Notifications,
@@ -193,7 +208,7 @@ fun HomeScreen(navController: NavController,
                             .fillMaxWidth()
                             .height(56.dp)
                             .clip(RoundedCornerShape(28.dp))
-                            .background(Color.White),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -205,7 +220,7 @@ fun HomeScreen(navController: NavController,
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Buscar",
-                                tint = Color.Gray,
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 modifier = Modifier.size(22.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -213,13 +228,13 @@ fun HomeScreen(navController: NavController,
                                 value = searchQuery,
                                 onValueChange = { viewModel.onSearchQueryChanged(it) },
                                 singleLine = true,
-                                textStyle = TextStyle(color = Color.Black, fontSize = 17.sp),
+                                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 17.sp),
                                 modifier = Modifier.weight(1f),
                                 decorationBox = { innerTextField ->
                                     if (searchQuery.isEmpty()) {
                                         Text(
                                             text = "Buscar médicos o especialidades...",
-                                            color = Color.Gray.copy(alpha = 0.7f),
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                             fontSize = 16.sp
                                         )
                                     }
@@ -248,6 +263,17 @@ fun HomeScreen(navController: NavController,
             Spacer(modifier = Modifier.height(16.dp))
 
             if (searchQuery.isBlank()) {
+                // 🔹 Filtro horizontal por ciudades (arriba)
+                if (cities.isNotEmpty()) {
+                    Button(
+                        onClick = { navController.navigate(Routes.CityFilter.route) },
+                        colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
+                        shape = RoundedCornerShape(50),
+                        modifier = Modifier.height(40.dp)
+                    ) { Text("Filtrar por ciudad", color = Color.White) }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 // 🗓️ Card próxima cita
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -271,58 +297,79 @@ fun HomeScreen(navController: NavController,
                             Text("Agenda tu primera cita", color = Color.Gray)
                         }
 
-                        Spacer(modifier = Modifier.height(10.dp))
-                        Button(
-                            onClick = { navController.navigate(Routes.Citas.route) },
-                            colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
-                            shape = RoundedCornerShape(50),
-                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                            modifier = Modifier
-                                .height(36.dp)
-                                .defaultMinSize(minWidth = 88.dp)
-                                .align(Alignment.Start)
-                        ) {
-                            Text("Ver", maxLines = 1)
+                        if (nextDoctor != null) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Button(
+                                onClick = { navController.navigate(Routes.Citas.route) },
+                                colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
+                                shape = RoundedCornerShape(50),
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                                modifier = Modifier
+                                    .height(36.dp)
+                                    .defaultMinSize(minWidth = 88.dp)
+                                    .align(Alignment.Start)
+                            ) {
+                                Text("Ver", maxLines = 1)
+                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Text(
-                    text = "Buscar por especialidad",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp
-                )
+                if (!selectedCity.isNullOrBlank()) {
+                    // Lista de doctores por ciudad
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        items(visibleDoctors.size) { index ->
+                            val doctor = visibleDoctors[index]
+                            DoctorCard(
+                                doctor = doctor,
+                                onDetailClick = {
+                                    navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
+                                })
+                        }
+                    }
+                } else {
+                    Text(
+                        text = "Buscar por especialidad",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxHeight()
-                ) {
-                    items(specialties) { (name, icon) ->
-                        Card(
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            modifier = Modifier
-                                .height(90.dp)
-                                .fillMaxWidth()
-                                .clickable {
-                                    val specialtyCode = specialtyMap[name] ?: name
-                                    navController.navigate("${Routes.DoctorList.route}/$specialtyCode")
-                                }
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                                modifier = Modifier.fillMaxSize()
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        items(specialties) { (name, icon) ->
+                            Card(
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                modifier = Modifier
+                                    .height(90.dp)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        val specialtyCode = specialtyMap[name] ?: name
+                                        navController.navigate("${Routes.DoctorList.route}/$specialtyCode")
+                                    }
                             ) {
-                                Text(icon, fontSize = 26.sp)
-                                Text(name, color = Color.Black, textAlign = TextAlign.Center)
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text(icon, fontSize = 26.sp)
+                                    Text(name, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
+                                }
                             }
                         }
                     }
@@ -336,11 +383,15 @@ fun HomeScreen(navController: NavController,
                         Text("No se encontraron resultados 😕", color = Color.Gray)
                     }
                 } else {
-                    LazyColumn(
+                val visibleDoctors = remember(doctorsFiltered, selectedCity) {
+                    if (selectedCity.isNullOrBlank()) doctorsFiltered
+                    else doctorsFiltered.filter { it.city.equals(selectedCity, ignoreCase = true) }
+                }
+                LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(doctorsFiltered.size) { index ->
-                            val doctor = doctorsFiltered[index]
+                    items(visibleDoctors.size) { index ->
+                        val doctor = visibleDoctors[index]
                             DoctorCard(
                                 doctor = doctor,
                                 onDetailClick = {

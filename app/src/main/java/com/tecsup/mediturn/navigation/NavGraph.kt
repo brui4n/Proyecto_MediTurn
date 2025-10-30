@@ -87,5 +87,8 @@ fun NavGraph() {
             val appointmentId = backStackEntry.arguments?.getInt("appointmentId") ?: 0
             PaymentSummaryScreen(navController, appointmentId)
         }
+
+        // Filtro por ciudad (sin buscador)
+        composable(Routes.CityFilter.route) { CityFilterScreen(navController) }
     }
 }

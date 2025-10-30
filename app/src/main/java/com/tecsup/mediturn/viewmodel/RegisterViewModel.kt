@@ -53,7 +53,26 @@ class RegisterViewModel(application: Application) : AndroidViewModel(application
             return
         }
 
-        // Validación de contraseñas
+        // Validación de correo básico
+        if (!emailInput.contains('@') || !Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matches(emailInput)) {
+            errorMessage.value = "Ingresa un correo válido"
+            return
+        }
+
+        // Reglas de contraseña segura
+        val pass = passwordInput
+        val hasMinLen = pass.length >= 8
+        val hasUpper = pass.any { it.isUpperCase() }
+        val hasLower = pass.any { it.isLowerCase() }
+        val hasDigit = pass.any { it.isDigit() }
+        val hasSymbol = pass.any { !it.isLetterOrDigit() }
+
+        if (!(hasMinLen && hasUpper && hasLower && hasDigit)) {
+            errorMessage.value = "La contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número"
+            return
+        }
+
+        // Validación de confirmación
         if (passwordInput != confirmInput) {
             errorMessage.value = "Las contraseñas no coinciden"
             return

@@ -52,11 +52,17 @@ fun AppointmentScreen(
         slotViewModel.loadSlots(doctorId)
     }
 
-    // Generar próximas 30 fechas desde hoy
-    val today = LocalDate.now()
-    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    val next30Days = remember {
-        (0..29).map { offset -> today.plusDays(offset.toLong()).format(dateFormatter) }
+    // Extraer fechas únicas con slots disponibles del doctor
+    val availableDates = remember(slotsState) {
+        val todayStr = try { LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) } catch (e: Exception) { null }
+        slotsState
+            .filter { it.available }
+            .map { it.date }
+            .distinct()
+            .filter { d ->
+                if (todayStr == null) true else try { LocalDate.parse(d) >= LocalDate.parse(todayStr) } catch (e: Exception) { true }
+            }
+            .sorted()
     }
 
     Column(
@@ -132,15 +138,22 @@ fun AppointmentScreen(
                 onDismissRequest = { expanded = false },
                 modifier = Modifier.background(MaterialTheme.colorScheme.surface)
             ) {
-                next30Days.forEach { fecha ->
+                if (availableDates.isEmpty() && !isLoading) {
                     DropdownMenuItem(
-                        text = { Text(formatDateDisplay(fecha), color = MaterialTheme.colorScheme.onSurface) },
-                        onClick = {
-                            selectedDate = fecha
-                            selectedSlot = null
-                            expanded = false
-                        }
+                        text = { Text("No hay fechas disponibles", color = MaterialTheme.colorScheme.onSurface) },
+                        onClick = { expanded = false }
                     )
+                } else {
+                    availableDates.forEach { fecha ->
+                        DropdownMenuItem(
+                            text = { Text(formatDateDisplay(fecha), color = MaterialTheme.colorScheme.onSurface) },
+                            onClick = {
+                                selectedDate = fecha
+                                selectedSlot = null
+                                expanded = false
+                            }
+                        )
+                    }
                 }
             }
         }

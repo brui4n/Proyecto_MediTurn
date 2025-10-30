@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -77,11 +78,12 @@ fun PaymentScreen(navController: NavController, doctorId: Int, slotId: Int, type
 
         // 🔹 Formulario principal
         Column(modifier = Modifier.padding(20.dp)) {
+            val headerColor = Color.White
             Text(
                 "Ingresa los datos de tu tarjeta",
                 fontWeight = FontWeight.SemiBold,
                 fontSize = MaterialTheme.typography.titleMedium.fontSize,
-                color = Color(0xFF333333)
+                color = headerColor
             )
 
             Spacer(modifier = Modifier.height(20.dp))

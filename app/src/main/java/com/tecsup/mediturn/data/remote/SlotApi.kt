@@ -15,4 +15,12 @@ interface SlotApi {
     suspend fun getSlotsByDoctor(
         @Query("doctor_id") doctorId: Int
     ): List<Slot>
+
+    // Trae slots de un doctor en una fecha específica (opcionalmente solo disponibles)
+    @GET("slots/")
+    suspend fun getSlotsByDoctorAndDate(
+        @Query("doctor_id") doctorId: Int,
+        @Query("date") date: String,
+        @Query("available") available: Boolean = true
+    ): List<Slot>
 }

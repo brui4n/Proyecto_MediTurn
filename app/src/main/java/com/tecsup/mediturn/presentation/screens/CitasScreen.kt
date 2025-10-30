@@ -124,41 +124,49 @@ fun CitasScreen(navController: NavController) {
         ) {
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text(
-                "Mis citas",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
+            Surface(
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // 🔹 Tabs
-            TabRow(
-                selectedTabIndex = selectedTab,
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                indicator = {},
-                divider = {}
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(12.dp)
             ) {
-                listOf("Próximas (${proximasCitas.size})", "Historial (${historialCitas.size})").forEachIndexed { index, title ->
-                    Tab(
-                        selected = selectedTab == index,
-                        onClick = { selectedTab = index },
-                        text = {
-                            Text(
-                                title,
-                                color = if (selectedTab == index) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                                fontWeight = if (selectedTab == index) FontWeight.SemiBold else FontWeight.Normal
-                            )
-                        },
-                        modifier = Modifier
-                            .background(
-                                if (selectedTab == index) BluePrimary else Color.Transparent,
-                                RoundedCornerShape(50)
-                            )
-                            .padding(horizontal = 16.dp, vertical = 6.dp)
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        "Mis citas",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // 🔹 Tabs
+                    TabRow(
+                        selectedTabIndex = selectedTab,
+                        containerColor = Color.Transparent,
+                        indicator = {},
+                        divider = {}
+                    ) {
+                        listOf("Próximas (${proximasCitas.size})", "Historial (${historialCitas.size})").forEachIndexed { index, title ->
+                            Tab(
+                                selected = selectedTab == index,
+                                onClick = { selectedTab = index },
+                                text = {
+                                    Text(
+                                        title,
+                                        color = if (selectedTab == index) Color.White else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                                        fontWeight = if (selectedTab == index) FontWeight.SemiBold else FontWeight.Normal
+                                    )
+                                },
+                                modifier = Modifier
+                                    .background(
+                                        if (selectedTab == index) BluePrimary else Color.Transparent,
+                                        RoundedCornerShape(50)
+                                    )
+                                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                            )
+                        }
+                    }
                 }
             }
 

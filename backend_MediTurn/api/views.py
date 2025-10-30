@@ -43,8 +43,17 @@ class SlotViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = Slot.objects.all()
         doctor_id = self.request.query_params.get('doctor_id')
+        date = self.request.query_params.get('date')
+        available = self.request.query_params.get('available')
         if doctor_id is not None:
             queryset = queryset.filter(doctor_id=doctor_id)
+        if date is not None:
+            queryset = queryset.filter(date=date)
+        if available is not None:
+            if available.lower() in ('true', '1', 'yes'):
+                queryset = queryset.filter(available=True)
+            elif available.lower() in ('false', '0', 'no'):
+                queryset = queryset.filter(available=False)
         return queryset
     # permission_classes = [IsAuthenticated]
 
@@ -68,12 +77,15 @@ class AppointmentViewSet(viewsets.ModelViewSet):
             today = _date.today()
             now_time = _datetime.now().time()
             if scope == 'upcoming':
-                qs = qs.filter(
+                # Próximas: fecha futura y NO canceladas
+                qs = qs.exclude(status='Cancelada').filter(
                     models.Q(slot__date__gt=today) |
                     (models.Q(slot__date=today) & models.Q(slot__time__gte=now_time))
                 )
             else:
+                # Historial: citas pasadas O citas canceladas (sin importar fecha)
                 qs = qs.filter(
+                    models.Q(status='Cancelada') |
                     models.Q(slot__date__lt=today) |
                     (models.Q(slot__date=today) & models.Q(slot__time__lt=now_time))
                 )

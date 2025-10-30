@@ -81,8 +81,9 @@ fun PaymentSummaryScreen(navController: NavController, appointmentId: Int) {
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            shape = RoundedCornerShape(12.dp)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(2.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Detalles de la cita", fontWeight = FontWeight.Bold, color = BluePrimary)
@@ -90,10 +91,10 @@ fun PaymentSummaryScreen(navController: NavController, appointmentId: Int) {
                 if (isLoading) {
                     Text("Cargando...")
                 } else {
-                    Text("📅 Fecha: $uiFecha")
-                    Text("⏰ Hora: $uiHora")
-                    Text("👩‍⚕️ Médico: $uiDoctor")
-                    Text("💳 Pago: S/ 150.00")
+                    Text("📅 Fecha: $uiFecha", color = MaterialTheme.colorScheme.onSurface)
+                    Text("⏰ Hora: $uiHora", color = MaterialTheme.colorScheme.onSurface)
+                    Text("👩‍⚕️ Médico: $uiDoctor", color = MaterialTheme.colorScheme.onSurface)
+                    Text("💳 Pago: S/ 150.00", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         }
