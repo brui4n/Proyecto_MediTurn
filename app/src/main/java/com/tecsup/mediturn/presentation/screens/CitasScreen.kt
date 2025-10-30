@@ -29,8 +29,12 @@ import com.tecsup.mediturn.data.repository.SlotRepository
 import com.tecsup.mediturn.data.session.SessionManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.first
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.verticalScroll
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.LocalTime
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import com.tecsup.mediturn.ui.theme.BluePrimary
 
@@ -180,10 +184,11 @@ fun CitasScreen(navController: NavController) {
             } else if (errorText != null) {
                 Text("Error: $errorText", color = Color(0xFFB00020))
             } else {
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(citas) { cita ->
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    items(citas) { cita ->
                         CitaCard(
                             cita = cita,
+                            showActions = selectedTab == 0,
                             onCancel = { selected ->
                                 // Confirmar cancelación
                                 openCancelDialog = selected
@@ -195,7 +200,12 @@ fun CitasScreen(navController: NavController) {
                                     try {
                                         val slots = slotRepo.getSlotsByDoctor(selected.doctorId)
                                         availableSlots = slots.filter { it.available }
-                                        selectedDate = availableSlots.firstOrNull()?.date ?: ""
+                                        val today = LocalDate.now()
+                                        val firstFuture = availableSlots
+                                            .map { LocalDate.parse(it.date) to it.date }
+                                            .filter { (ld, _) -> !ld.isBefore(today) }
+                                            .minByOrNull { it.first }?.second
+                                        selectedDate = firstFuture ?: ""
                                         selectedSlotId = null
                                     } catch (e: Exception) {
                                         errorText = e.message
@@ -244,7 +254,13 @@ fun CitasScreen(navController: NavController) {
 
             // Dialogo de reprogramar
             openRescheduleFor?.let { c ->
-                val dates = availableSlots.map { it.date }.distinct()
+                val today = LocalDate.now()
+                val dates = availableSlots
+                    .map { LocalDate.parse(it.date) }
+                    .filter { !it.isBefore(today) }
+                    .distinct()
+                    .sorted()
+                    .map { it.toString() }
                 val slotsForDate = availableSlots.filter { it.date == selectedDate }
                 AlertDialog(
                     onDismissRequest = { openRescheduleFor = null },
@@ -278,11 +294,11 @@ fun CitasScreen(navController: NavController) {
                     dismissButton = { TextButton(onClick = { openRescheduleFor = null }) { Text("Cerrar") } },
                     title = { Text("Reprogramar cita") },
                     text = {
-                        Column {
+                        Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                             Text("Selecciona fecha")
                             Spacer(Modifier.height(8.dp))
-                            // fechas
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            // fechas (envolver en múltiples líneas)
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 dates.forEach { d ->
                                     val isSelected = d == selectedDate
                                     OutlinedButton(
@@ -298,7 +314,7 @@ fun CitasScreen(navController: NavController) {
                             Spacer(Modifier.height(12.dp))
                             Text("Selecciona hora")
                             Spacer(Modifier.height(8.dp))
-                            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 slotsForDate.forEach { s ->
                                     val isSelected = selectedSlotId == s.id
                                     OutlinedButton(
@@ -323,6 +339,7 @@ fun CitasScreen(navController: NavController) {
 @Composable
 fun CitaCard(
     cita: Cita,
+    showActions: Boolean,
     onCancel: (Cita) -> Unit,
     onReschedule: (Cita) -> Unit
 ) {
@@ -371,12 +388,14 @@ fun CitaCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedButton(onClick = { onReschedule(cita) }) {
-                    Text("Reprogramar")
-                }
-                OutlinedButton(onClick = { onCancel(cita) }, colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFB00020))) {
-                    Text("Cancelar")
+            if (showActions) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = { onReschedule(cita) }) {
+                        Text("Reprogramar")
+                    }
+                    OutlinedButton(onClick = { onCancel(cita) }, colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFB00020))) {
+                        Text("Cancelar")
+                    }
                 }
             }
         }

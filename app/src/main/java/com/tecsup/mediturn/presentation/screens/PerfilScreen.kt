@@ -33,6 +33,8 @@ import com.tecsup.mediturn.data.repository.PatientRepository
 import com.tecsup.mediturn.data.session.SessionManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.firstOrNull
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.filled.Logout
 import com.tecsup.mediturn.R
 
 @Composable
@@ -287,6 +289,39 @@ fun PerfilScreen(navController: NavController) {
                         checked = darkMode,
                         onCheckedChange = { on -> scope.launch { session.setDarkMode(on) } }
                     )
+                }
+            }
+
+            // Botón Cerrar sesión debajo del bloque de modo oscuro
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp)
+                    .offset(y = 130.dp + mainCardHeightDp + 16.dp + 88.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                OutlinedButton(
+                    onClick = {
+                        scope.launch {
+                            session.clearSession()
+                            navController.navigate(Routes.Login.route) {
+                                popUpTo(Routes.Home.route) { inclusive = true }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, Color(0xFFFFCDD2)),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = Color(0xFFD32F2F)
+                    )
+                ) {
+                    Icon(Icons.Filled.Logout, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Cerrar sesión")
                 }
             }
         }

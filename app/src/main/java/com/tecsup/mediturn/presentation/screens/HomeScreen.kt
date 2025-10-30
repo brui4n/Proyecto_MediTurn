@@ -166,38 +166,8 @@ fun HomeScreen(navController: NavController,
                                 fontWeight = FontWeight.Bold
                             )
                         }
-
-                        // 🔽 Menú desplegable de usuario
-                        Box {
-                            IconButton(
-                                onClick = { expanded = true },
-                                modifier = Modifier
-                                    .size(40.dp)
-                            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Menú de usuario",
-                                    tint = WhiteText
-                                )
-                            }
-
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("Cerrar sesión", color = Color.Red) },
-                                    onClick = {
-                                        expanded = false
-                                        loginViewModel.logout()
-                                        navController.navigate(Routes.Login.route) {
-                                            popUpTo(Routes.Home.route) { inclusive = true }
-                                        }
-                                    }
-                                )
-                            }
-                        }
+                        // Espaciador para alinear contenido sin la campanita
+                        Spacer(modifier = Modifier.width(0.dp))
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -269,8 +239,13 @@ fun HomeScreen(navController: NavController,
                         onClick = { navController.navigate(Routes.CityFilter.route) },
                         colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
                         shape = RoundedCornerShape(50),
-                        modifier = Modifier.height(40.dp)
-                    ) { Text("Filtrar por ciudad", color = Color.White) }
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        contentPadding = PaddingValues(vertical = 12.dp)
+                    ) {
+                        Text("Filtrar por ciudad", color = Color.White, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
