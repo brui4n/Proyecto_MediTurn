@@ -1,89 +1,87 @@
 ### Documentacion del quinto dia
-# 🧩 Día 5 – Funcionalidades Clave y Pulido
+# MediTurn - Día 5: Funcionalidades Clave y Pulido
 
-### 📅 Fecha
-27 de octubre de 2025
+## Fecha: 28/10/2025
 
-### 🎯 Objetivo del día
-Integrar búsqueda y filtrado, validaciones y gestión de citas dentro del proyecto *MediTurn*, dejando una versión candidata (v1.0) con el flujo de reserva completo.
-
----
-
-## ✅ Actividades Realizadas
-
-Durante este día, se avanzó principalmente en la *conexión del frontend con la API del backend (Django)*, asegurando que la aplicación pueda consumir datos reales desde el servidor.
-El enfoque estuvo en estabilizar la capa de datos y garantizar la comunicación entre las capas de la arquitectura.
-
-### 🔹 1. Adaptación de modelos
-- Se revisaron y ajustaron los modelos del proyecto *MediTurn* (Doctor, Patient, Slot, Appointment) para mantener coherencia entre la app y el backend.
-- Se verificó que las propiedades de los modelos coincidieran con los campos expuestos en los endpoints de Django REST Framework.
-
-### 🔹 2. Implementación del ApiService
-- Se creó la interfaz `ApiService` utilizando *Retrofit*.
-- Se definieron los endpoints necesarios, especialmente el de *obtención de doctores* (`GET /api/doctors/`).
-- Se configuraron los métodos de acceso asíncrono con `suspend` y `Response<List<Doctor>>`.
-
-### 🔹 3. Creación del RetrofitInstance
-- Se configuró la instancia de Retrofit con:
-  - `BASE_URL` apuntando al backend (`http://127.0.0.1:8000/api/`).
-  - Conversor *Gson* para el manejo automático del JSON.
-  - Cliente OkHttp para depuración con logs de red.
-
-### 🔹 4. Creación del DoctorRepository
-- Se implementó la capa *Repository*, encargada de centralizar las llamadas a la API y servir datos a los ViewModels.
-- Se incluyeron métodos asincrónicos para obtener doctores desde el backend usando `runBlocking` en las pruebas unitarias.
-- Se reemplazó la antigua versión del repositorio que trabajaba con datos locales (mock) por la versión conectada a la API real.
-
-### 🔹 5. Pruebas unitarias de conexión (DoctorRepositoryTest)
-- Se creó una prueba unitaria que valida la comunicación entre el cliente Android y el servidor Django.
-- Resultado exitoso ✅:
-  ```bash
-  ✅ Número de doctores: 1
-  BUILD SUCCESSFUL in 1s
-  ```
-  - Esto confirma que Retrofit obtiene correctamente los datos JSON desde el backend.
+### Objetivo del día
+Integrar la carga de slots desde el backend mediante Retrofit, mostrar la información en la pantalla de agendamiento de citas y conectar la navegación desde la lista de doctores.
 
 ---
 
-## ⚙️ Actividades Pendientes
+## Funcionalidades implementadas
 
-Las siguientes tareas están planificadas pero aún no implementadas:
+1. *Conexión con Retrofit*
+   - Se creó el SlotApi para consumir los endpoints:
+     - GET /slots/ → Lista de todos los slots.
+     - GET /slots/?doctor_id=X → Slots filtrados por doctor.
+   - Se implementó SlotRepository como capa de abstracción sobre el API.
 
-1.  **🔍 Búsqueda y filtrado de doctores por:**
-    - Especialidad
-    - Ciudad
-    - Teleconsulta
-2.  **🧾 Validaciones de formularios:**
-    - Validar campos en registro, login y reserva de citas.
-    - Mostrar mensajes de error adecuados al usuario.
-3.  **🗓 Gestión de citas:**
-    - Crear, reprogramar y cancelar citas desde la app móvil.
-    - Sincronizar con el backend.
-4.  **🧪 QA (Quality Assurance):**
-    - Pruebas funcionales en diferentes emuladores.
-    - Validar compatibilidad con modo oscuro.
-5.  **🔄 Pull requests y revisión de código:**
-    - Integración de ramas de desarrollo.
-    - Limpieza de código y documentación previa a la entrega v1.0 candidata.
+2. *ViewModel para Slots*
+   - SlotViewModel maneja:
+     - Estado de la lista de slots (slots: StateFlow<List<Slot>>)
+     - Estado de carga (isLoading: StateFlow<Boolean>)
+     - Errores (error: StateFlow<String?>)
+   - Método loadSlots(doctorId: Int) para cargar slots del backend de forma asíncrona usando viewModelScope.launch.
 
----
+3. *AppointmentScreen*
+   - Recibe doctorId y un SlotViewModel.
+   - Permite seleccionar:
+     - Fecha de la cita (dropdown con próximos 30 días).
+     - Hora de la cita (filtrada por slots disponibles del doctor).
+     - Tipo de consulta (Presencial o Teleconsulta).
+     - Motivo de la consulta (campo de texto).
+   - Botón "Confirmar cita" habilitado solo si se selecciona fecha, hora y se ingresa motivo.
+   - Se agregaron logs para debug de slots y filtrado por fecha.
 
-## 📦 Estado Actual
+4. *Conexión con DoctorCard*
+   - Desde DoctorListScreen al hacer click en "Ver detalle", se navega a AppointmentScreen pasando el doctorId.
+   - Uso de rememberUpdatedState para pasar la acción de navegación correctamente.
 
-| Componente                  | Estado         | Descripción breve                   |
-| --------------------------- | -------------- | ----------------------------------- |
-| Modelos (data layer)        | ✅ Completo    | Ajustados al backend Django         |
-| ApiService                  | ✅ Completo    | Configurado con Retrofit y Gson     |
-| RetrofitInstance            | ✅ Completo    | Base URL y cliente HTTP configurado |
-| DoctorRepository            | ✅ Completo    | Conectado a la API real             |
-| Pruebas de conexión         | ✅ Éxito total | Comunicación backend confirmada     |
-| Filtrado / Búsqueda         | ⏳ Pendiente   | Próxima tarea                       |
-| Validaciones de formularios | ⏳ Pendiente   | A implementar                       |
-| Gestión de citas            | ⏳ Pendiente   | A implementar                       |
-| QA y PRs                    | ⏳ Pendiente   | A realizar previo a entrega v1.0    |
+5. *Filtrado de slots*
+   - Solo se muestran los slots que coinciden con la fecha seleccionada.
+   - Slots deshabilitados aparecen en color rojo claro (Color(0xFFFFCDD2)).
+   - Slots seleccionados se muestran en color azul (BluePrimary).
 
 ---
 
-## 🚀 Próximo objetivo
+## Estado actual
 
-Implementar el flujo de búsqueda y filtrado de doctores reales utilizando el nuevo `DoctorRepository`, integrando los resultados dinámicos en la interfaz `HomeScreen`.
+- ✅ Conexión exitosa con Retrofit y carga de slots.
+- ✅ Filtrado de slots por doctor y fecha.
+- ✅ Selección de fecha, hora, tipo de consulta y motivo.
+- ✅ Navegación desde DoctorCard a AppointmentScreen.
+
+- ❌ No se implementó:
+  - Validaciones avanzadas del formulario.
+  - Reprogramación o cancelación de citas.
+  - QA completo en emuladores ni modo oscuro.
+  - Filtro por ciudad o teleconsulta desde la lista de doctores (solo selección de tipo de consulta en AppointmentScreen).
+
+---
+
+## Próximos pasos
+
+1. Implementar validaciones completas en AppointmentScreen.
+2. Agregar reprogramación y cancelación de citas.
+3. Extender la búsqueda/filtrado en DoctorListScreen por ciudad y teleconsulta.
+4. QA en emuladores y modo oscuro.
+5. Preparar pull request y revisión de código para integración de la versión candidata v1.0.
+
+---
+
+### Notas técnicas
+
+- Modelos utilizados:
+```kotlin
+data class Slot(
+    val id: Int,
+    val doctor: Doctor,
+    val date: String, // YYYY-MM-DD
+    val time: String, // HH:MM
+    val available: Boolean
+)
+```
+- Patrón de arquitectura:
+  - SlotApi → SlotRepository → SlotViewModel → AppointmentScreen
+  - Uso de StateFlow para estado reactivo.
+  - Manejo de UI basado en Jetpack Compose con FlowRow para mostrar slots.
