@@ -126,12 +126,3 @@ com.tecsup.mediturn/
 | 6 | Presentación final | README completo, demo y entrega final |
 
 ---
-
-## 📱 Estado actual del proyecto
-
-✅ Proyecto base creado en Android Studio  
-✅ Estructura de paquetes organizada <br>
-✅ Primer diseño en figma <br>
-🕓 Pendiente: (PR sobre la version 1.0)
-
----
