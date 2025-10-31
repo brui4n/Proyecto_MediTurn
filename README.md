@@ -36,43 +36,59 @@ El objetivo es ofrecer una experiencia moderna, rápida y organizada para la **g
 
 ---
 
-## 🧩 Arquitectura base
+## 🏛️ Arquitectura y Estructura del Proyecto
 
-El proyecto sigue el patrón MVVM (Model–View–ViewModel), combinando consumo de API REST (Django + Retrofit) con una organización modular clara: <br>
+La aplicación está construida sobre la arquitectura **MVVM (Model-View-ViewModel)**, un patrón moderno que separa la lógica de la interfaz de usuario para crear aplicaciones robustas y fáciles de mantener.
 
-com.tecsup.mediturn <br>
-├── data <br>
-│   ├── model          → Modelos de datos (Doctor, Appointment, Patient, etc.) <br>
-│   ├── remote         → Conexión con el backend (Retrofit, Endpoints, DTOs, AuthInterceptor) <br>
-│   ├── repository     → Intermediarios entre ViewModels y capa remota (lógica de red y manejo de errores) <br>
-│   └── session        → Gestión de sesión y token del usuario <br>
-│
-├── presentation <br>
-│   ├── screens        → Pantallas principales (Login, Registro, Home, Citas, etc.) <br>
-│   ├── components     → Componentes reutilizables (BottomBar, DoctorCard, etc.) <br>
-│   └── MainActivity.kt → Contenedor principal del flujo de navegación <br>
-│
-├── viewmodel          → Manejo de estados, peticiones y lógica de negocio (uno por entidad principal) <br>
-│
-├── navigation          → Definición de rutas y NavHost <br>
-│
-├── ui/theme            → Definición de colores, tipografía y estilos globales <br>
-│
-└── util                → Utilidades compartidas (Constantes, envoltorio Resource) <br>
-## 🛠️ Tecnologías utilizadas
+*   **Model (Capa de Datos):** Se encarga de toda la lógica de datos. Incluye los modelos (`data/model`), la conexión a la API con Retrofit (`data/remote`) y los **Repositorios** (`data/repository`), que actúan como única fuente de verdad para los ViewModels.
+*   **View (Capa de UI):** Es la capa de presentación, construida con Jetpack Compose (`presentation`). Su única función es observar los datos expuestos por el ViewModel y pintar la pantalla. Es una capa "tonta", sin lógica de negocio.
+*   **ViewModel:** Sirve de puente. Contiene la lógica de negocio (`viewmodel`), recibe las interacciones del usuario, pide datos a los repositorios y expone el estado de la UI para que la View lo consuma de forma reactiva.
 
-	•	Lenguaje: Kotlin
-	•	Framework: Jetpack Compose (Material 3)
-	•	Arquitectura: MVVM (Model–View–ViewModel)
-	•	Consumo de API: Retrofit + Gson Converter
-	•	Backend: Django REST Framework
-	•	Base de datos del backend: SQLite (predeterminada de Django)
-	•	Gestión de sesión: SharedPreferences mediante SessionManager
-	•	Navegación: Navigation Compose
-	•	Diseño: Figma
-	•	Control de versiones: Git / GitHub
-	•	Testing: JUnit + pruebas instrumentadas (Android Test)
-	•	Configuración de red: network_security_config.xml para conexión con backend local o remoto
+### Estructura de Paquetes
+
+Para implementar esta arquitectura, el proyecto se organizó de la siguiente manera:
+
+```
+com.tecsup.mediturn/
+├── data/
+│   ├── model/      # Contiene las clases de datos (Doctor, Patient, Slot).
+│   ├── remote/     # Gestiona la conexión con el backend (Retrofit, Endpoints, DTOs).
+│   ├── repository/ # Provee los datos al ViewModel, abstrayendo si vienen de la API o de una BD local.
+│   └── session/    # Administra la sesión del usuario (token, datos de usuario logueado).
+│
+├── presentation/
+│   ├── screens/    # Cada pantalla de la aplicación (LoginScreen, HomeScreen, etc.).
+│   └── components/ # Componentes de UI reutilizables (botones, cards, etc.).
+│
+├── viewmodel/
+│   # Contiene los ViewModels, responsables de la lógica y el estado de cada pantalla.
+│
+├── navigation/
+│   # Define las rutas y el grafo de navegación de la aplicación con Navigation Compose.
+│
+├── ui/
+│   └── theme/      # Archivos de tema (colores, tipografía y estilos globales).
+│
+└── util/
+    # Clases de utilidad y wrappers (ej. Resource para manejar estados de carga/error/éxito).
+```
+
+---
+
+## 🛠️ Tecnologías Utilizadas
+
+*   **Lenguaje:** Kotlin
+*   **Framework:** Jetpack Compose (Material 3)
+*   **Arquitectura:** MVVM (Model–View–ViewModel)
+*   **Consumo de API:** Retrofit + Gson Converter
+*   **Backend:** Django REST Framework
+*   **Base de datos del backend:** SQLite
+*   **Gestión de sesión:** SharedPreferences
+*   **Navegación:** Navigation Compose
+*   **Diseño:** Figma
+*   **Control de versiones:** Git / GitHub
+*   **Testing:** JUnit + Android Test
+
 ---
 
 ## 🧠 Historias de usuario (provisionales)
