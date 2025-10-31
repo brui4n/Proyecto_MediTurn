@@ -15,9 +15,13 @@ sealed class Routes (val route: String){
     object Citas : Routes("citas")
     object Perfil : Routes("perfil")
     object DoctorList : Routes("doctor_list")
-    object Appointment : Routes("appointment") // ✅ esta es la forma correcta
+    object Appointment : Routes("appointment")
     object Payment : Routes("payment")
     object PaymentSummary : Routes("payment_summary")
+    object CityFilter : Routes("city_filter")
+
+    object DoctorDetail: Routes("doctor")
+
 
 
 }

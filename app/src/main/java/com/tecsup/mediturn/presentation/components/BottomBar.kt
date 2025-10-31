@@ -18,9 +18,13 @@ fun BottomBar(
     currentRoute: String,
     modifier: Modifier = Modifier
 ) {
+    val container = MaterialTheme.colorScheme.surfaceVariant
+    val selectedColor = Color.White
+    val unselectedColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+
     NavigationBar(
         modifier = modifier,
-        containerColor = Color.White
+        containerColor = container
     ) {
         NavigationBarItem(
             selected = currentRoute == Routes.Home.route,
@@ -28,10 +32,10 @@ fun BottomBar(
             icon = { Icon(Icons.Default.Home, contentDescription = "Inicio") },
             label = { Text("Home") },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color(0xFF1E88E5),
-                selectedTextColor = Color(0xFF1E88E5),
-                unselectedIconColor = Color.Gray,
-                unselectedTextColor = Color.Gray,
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor,
                 indicatorColor = Color.Transparent
             )
         )
@@ -39,13 +43,27 @@ fun BottomBar(
             selected = currentRoute == Routes.Citas.route,
             onClick = { navController.navigate(Routes.Citas.route) },
             icon = { Icon(Icons.Default.DateRange, contentDescription = "Citas") },
-            label = { Text("Citas") }
+            label = { Text("Citas") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor,
+                indicatorColor = Color.Transparent
+            )
         )
         NavigationBarItem(
             selected = currentRoute == Routes.Perfil.route,
             onClick = { navController.navigate(Routes.Perfil.route) },
             icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
-            label = { Text("Perfil") }
+            label = { Text("Perfil") },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor = selectedColor,
+                selectedTextColor = selectedColor,
+                unselectedIconColor = unselectedColor,
+                unselectedTextColor = unselectedColor,
+                indicatorColor = Color.Transparent
+            )
         )
     }
 }

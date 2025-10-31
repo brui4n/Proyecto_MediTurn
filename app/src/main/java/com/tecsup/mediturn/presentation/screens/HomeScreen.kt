@@ -1,9 +1,11 @@
 package com.tecsup.mediturn.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -36,6 +38,10 @@ import com.tecsup.mediturn.ui.theme.*
 import com.tecsup.mediturn.viewmodel.HomeViewModel
 import com.tecsup.mediturn.viewmodel.LoginViewModel
 import com.tecsup.mediturn.data.session.UserSession
+import com.tecsup.mediturn.data.remote.RetrofitInstance
+import com.tecsup.mediturn.data.repository.AppointmentRepository
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun HomeScreen(navController: NavController,
@@ -74,6 +80,59 @@ fun HomeScreen(navController: NavController,
         "Pediatría" to "👶"
     )
 
+    // Filtro por ciudad
+    var selectedCity by remember { mutableStateOf<String?>(null) } // null = todas
+    val cities = remember(doctorsFiltered) {
+        doctorsFiltered.mapNotNull { it.city?.takeIf { c -> c.isNotBlank() } }
+            .distinct()
+            .sorted()
+    }
+
+    val visibleDoctors = remember(doctorsFiltered, selectedCity) {
+        if (selectedCity.isNullOrBlank()) doctorsFiltered
+        else doctorsFiltered.filter { it.city.equals(selectedCity, ignoreCase = true) }
+    }
+    // Próxima cita del paciente
+    val repo = remember { AppointmentRepository(RetrofitInstance.appointmentApi(context)) }
+    var nextDoctor by remember { mutableStateOf<String?>(null) }
+    var nextSpecialty by remember { mutableStateOf<String?>(null) }
+    var nextDate by remember { mutableStateOf<String?>(null) }
+    var nextTime by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(userSession) {
+        val user = userSession ?: return@LaunchedEffect
+        try {
+            val upcoming = repo.getAppointmentsByPatient(user.id, scope = "upcoming")
+            val first = upcoming.firstOrNull()
+            if (first != null) {
+                nextDoctor = first.doctor.name
+                nextSpecialty = first.doctor.specialty
+                val parts = first.slot.date.split("-")
+                nextDate = "${parts[2]}/${parts[1]}/${parts[0]}"
+                val h24 = DateTimeFormatter.ofPattern("HH:mm")
+                val h12 = DateTimeFormatter.ofPattern("hh:mm a")
+                nextTime = try { LocalTime.parse(first.slot.time.substring(0,5), h24).format(h12) } catch (_: Exception) { first.slot.time }
+            } else {
+                nextDoctor = null
+                nextSpecialty = null
+                nextDate = null
+                nextTime = null
+            }
+        } catch (_: Exception) {
+            // silencioso para no romper home si backend falla
+        }
+    }
+
+    val specialtyMap = mapOf(
+        "Cardiología" to "CARDIOLOGIA",
+        "Neurología" to "NEUROLOGIA",
+        "Oftalmología" to "OFTALMOLOGIA",
+        "Traumatología" to "TRAUMATOLOGIA",
+        "Medicina General" to "MEDICINA_GENERAL",
+        "Pediatría" to "PEDIATRIA"
+    )
+
+
     Scaffold(
         topBar = {
             var expanded by remember { mutableStateOf(false) }
@@ -107,42 +166,8 @@ fun HomeScreen(navController: NavController,
                                 fontWeight = FontWeight.Bold
                             )
                         }
-
-                        // 🔽 Menú desplegable de usuario
-                        Box {
-                            IconButton(
-                                onClick = { expanded = true },
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .background(WhiteTransparent, CircleShape)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Notifications,
-                                    contentDescription = "Menú de usuario",
-                                    tint = WhiteText
-                                )
-                            }
-
-                            DropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false }
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text("Perfil") },
-                                    onClick = { expanded = false /* Ir al perfil */ }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text("Cerrar sesión", color = Color.Red) },
-                                    onClick = {
-                                        expanded = false
-                                        loginViewModel.logout()
-                                        navController.navigate(Routes.Login.route) {
-                                            popUpTo(Routes.Home.route) { inclusive = true }
-                                        }
-                                    }
-                                )
-                            }
-                        }
+                        // Espaciador para alinear contenido sin la campanita
+                        Spacer(modifier = Modifier.width(0.dp))
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -153,7 +178,7 @@ fun HomeScreen(navController: NavController,
                             .fillMaxWidth()
                             .height(56.dp)
                             .clip(RoundedCornerShape(28.dp))
-                            .background(Color.White),
+                            .background(MaterialTheme.colorScheme.surfaceVariant),
                         contentAlignment = Alignment.CenterStart
                     ) {
                         Row(
@@ -165,7 +190,7 @@ fun HomeScreen(navController: NavController,
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Buscar",
-                                tint = Color.Gray,
+                                tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                                 modifier = Modifier.size(22.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
@@ -173,13 +198,13 @@ fun HomeScreen(navController: NavController,
                                 value = searchQuery,
                                 onValueChange = { viewModel.onSearchQueryChanged(it) },
                                 singleLine = true,
-                                textStyle = TextStyle(color = Color.Black, fontSize = 17.sp),
+                                textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface, fontSize = 17.sp),
                                 modifier = Modifier.weight(1f),
                                 decorationBox = { innerTextField ->
                                     if (searchQuery.isEmpty()) {
                                         Text(
                                             text = "Buscar médicos o especialidades...",
-                                            color = Color.Gray.copy(alpha = 0.7f),
+                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                                             fontSize = 16.sp
                                         )
                                     }
@@ -197,7 +222,7 @@ fun HomeScreen(navController: NavController,
                 currentRoute = Routes.Home.route
             )
         },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -208,71 +233,118 @@ fun HomeScreen(navController: NavController,
             Spacer(modifier = Modifier.height(16.dp))
 
             if (searchQuery.isBlank()) {
+                // 🔹 Filtro horizontal por ciudades (arriba)
+                if (cities.isNotEmpty()) {
+                    Button(
+                        onClick = { navController.navigate(Routes.CityFilter.route) },
+                        colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
+                        shape = RoundedCornerShape(50),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        contentPadding = PaddingValues(vertical = 12.dp)
+                    ) {
+                        Text("Filtrar por ciudad", color = Color.White, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+
                 // 🗓️ Card próxima cita
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F4FD)),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(16.dp)
                     ) {
-                        Column {
-                            Text("📅 Próxima cita", color = BluePrimary, fontSize = 14.sp)
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text("Dra. María González", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                            Text("Cardiología", color = Color.Gray)
+                        Text("📅 Próxima cita", color = BluePrimary, fontSize = 14.sp)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        if (nextDoctor != null) {
+                            Text(nextDoctor!!, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            val extra = listOfNotNull(nextSpecialty, listOfNotNull(nextDate, nextTime).joinToString(" · ")).filter { it.isNotBlank() }.joinToString("  •  ")
+                            if (extra.isNotBlank()) Text(extra, color = Color.Gray)
+                        } else {
+                            Text("Sin próximas citas", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                            Text("Agenda tu primera cita", color = Color.Gray)
                         }
 
-                        Button(
-                            onClick = { /* Ver cita */ },
-                            colors = ButtonDefaults.buttonColors(containerColor = BluePrimary)
-                        ) {
-                            Text("Ver")
+                        if (nextDoctor != null) {
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Button(
+                                onClick = { navController.navigate(Routes.Citas.route) },
+                                colors = ButtonDefaults.buttonColors(containerColor = BluePrimary),
+                                shape = RoundedCornerShape(50),
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                                modifier = Modifier
+                                    .height(36.dp)
+                                    .defaultMinSize(minWidth = 88.dp)
+                                    .align(Alignment.Start)
+                            ) {
+                                Text("Ver", maxLines = 1)
+                            }
                         }
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                Text(
-                    text = "Buscar por especialidad",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 18.sp
-                )
+                if (!selectedCity.isNullOrBlank()) {
+                    // Lista de doctores por ciudad
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        items(visibleDoctors.size) { index ->
+                            val doctor = visibleDoctors[index]
+                            DoctorCard(
+                                doctor = doctor,
+                                onDetailClick = {
+                                    navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
+                                })
+                        }
+                    }
+                } else {
+                    Text(
+                        text = "Buscar por especialidad",
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 18.sp
+                    )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.fillMaxHeight()
-                ) {
-                    items(specialties) { (name, icon) ->
-                        Card(
-                            shape = RoundedCornerShape(16.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                            modifier = Modifier
-                                .height(90.dp)
-                                .fillMaxWidth()
-                                .clickable {
-                                    navController.navigate("${Routes.DoctorList.route}/$name")
-                                }
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center,
-                                modifier = Modifier.fillMaxSize()
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        items(specialties) { (name, icon) ->
+                            Card(
+                                shape = RoundedCornerShape(16.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                                modifier = Modifier
+                                    .height(90.dp)
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        val specialtyCode = specialtyMap[name] ?: name
+                                        navController.navigate("${Routes.DoctorList.route}/$specialtyCode")
+                                    }
                             ) {
-                                Text(icon, fontSize = 26.sp)
-                                Text(name, color = Color.Black, textAlign = TextAlign.Center)
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    Text(icon, fontSize = 26.sp)
+                                    Text(name, color = MaterialTheme.colorScheme.onSurface, textAlign = TextAlign.Center)
+                                }
                             }
                         }
                     }
@@ -286,13 +358,20 @@ fun HomeScreen(navController: NavController,
                         Text("No se encontraron resultados 😕", color = Color.Gray)
                     }
                 } else {
-                    LazyColumn(
+                val visibleDoctors = remember(doctorsFiltered, selectedCity) {
+                    if (selectedCity.isNullOrBlank()) doctorsFiltered
+                    else doctorsFiltered.filter { it.city.equals(selectedCity, ignoreCase = true) }
+                }
+                LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(doctorsFiltered.size) { index ->
-                            val doctor = doctorsFiltered[index]
+                    items(visibleDoctors.size) { index ->
+                        val doctor = visibleDoctors[index]
                             DoctorCard(
-                                doctor = doctor){}
+                                doctor = doctor,
+                                onDetailClick = {
+                                    navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
+                                })
                         }
                     }
                 }

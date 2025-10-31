@@ -7,7 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -19,12 +19,38 @@ import coil.compose.rememberAsyncImagePainter
 import com.tecsup.mediturn.data.model.Doctor
 import com.tecsup.mediturn.ui.theme.BluePrimary
 import com.tecsup.mediturn.ui.theme.GreenAccent
+import com.tecsup.mediturn.data.remote.RetrofitInstance
+import com.tecsup.mediturn.data.repository.SlotRepository
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import android.os.Build
+import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun DoctorCard(
     doctor: Doctor,
     onDetailClick: () -> Unit
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var availableToday by remember { mutableStateOf<Boolean?>(null) }
+
+    LaunchedEffect(doctor.id) {
+        scope.launch {
+            try {
+                val repo = SlotRepository(RetrofitInstance.slotApi(context))
+                val today = try {
+                    LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                } catch (e: Exception) { null }
+                availableToday = if (today == null) null else repo.getSlotsByDoctorAndDate(doctor.id, today, true).isNotEmpty()
+            } catch (_: Exception) {
+                availableToday = null
+            }
+        }
+    }
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -40,11 +66,14 @@ fun DoctorCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 // Imagen del doctor
+                val imageUrl = if (!doctor.image.isNullOrBlank()) {
+                    doctor.image
+                } else {
+                    "https://cdn-icons-png.flaticon.com/512/2922/2922506.png"
+                }
+
                 Image(
-                    painter = rememberAsyncImagePainter(
-                        if (doctor.imageUrl.isNotBlank()) doctor.imageUrl
-                        else "https://cdn-icons-png.flaticon.com/512/2922/2922506.png"
-                    ),
+                    painter = rememberAsyncImagePainter(imageUrl),
                     contentDescription = doctor.name,
                     modifier = Modifier
                         .size(70.dp)
@@ -65,31 +94,36 @@ fun DoctorCard(
                         color = MaterialTheme.colorScheme.primary
                     )
 
+
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // Rating con estrella
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = "Rating",
-                            tint = MaterialTheme.colorScheme.tertiary
-                        )
+                    // Ciudad (opcional)
+                    doctor.city?.let {
                         Text(
-                            text = "${doctor.rating}",
-                            fontSize = 14.sp,
+                            text = it,
+                            fontSize = 13.sp,
                             fontWeight = FontWeight.Medium
                         )
                     }
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    // Disponibilidad
-                    Text(
-                        text = "Disponible hoy",
-                        color = GreenAccent,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                    // Disponibilidad basada en slots de hoy
+                    when (availableToday) {
+                        true -> Text(
+                            text = "Disponible hoy",
+                            color = GreenAccent,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        false -> Text(
+                            text = "No disponible hoy",
+                            color = Color(0xFFB00020),
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        null -> { /* sin texto mientras carga o en error */ }
+                    }
                 }
             }
 

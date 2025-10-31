@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -12,13 +13,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.tecsup.mediturn.navigation.Routes
-import com.tecsup.mediturn.repository.PatientRepository
 import com.tecsup.mediturn.ui.theme.*
 import com.tecsup.mediturn.viewmodel.RegisterViewModel
 
@@ -27,35 +28,34 @@ fun RegisterScreen(
     navController: NavController,
     viewModel: RegisterViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
-    var fullName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
-    var phone by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("Masculino") } // valor por defecto
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
+    // Usamos los estados del ViewModel
+    val name by viewModel.name
+    val email by viewModel.email
+    val phone by viewModel.phone
+    val gender by viewModel.gender
+    val age by viewModel.age
+    val password by viewModel.password
+    val confirmPassword by viewModel.confirmPassword
 
-    val errorMessage by viewModel.errorMessage.collectAsState()
-    val successMessage by viewModel.successMessage.collectAsState()
-    val isRegistered by viewModel.isRegistered.collectAsState()
+    val errorMessage by viewModel.errorMessage
+    val successMessage by viewModel.successMessage
+    val isLoading by viewModel.isLoading
+    val isRegistered by viewModel.isRegistered
 
-    // Redirección tras registro
-    LaunchedEffect(isRegistered) {
-        if (isRegistered) navController.navigate(Routes.Login.route)
-    }
-
+    // Scrollable Column
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
             .verticalScroll(rememberScrollState())
     ) {
-        // Encabezado
+        // Encabezado con degradado azul–verde
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
                 .background(
-                    Brush.verticalGradient(colors = listOf(GreenAccent, GreenDark)),
+                    Brush.verticalGradient(colors = BackgroundGradient),
                     shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
                 )
                 .padding(horizontal = 24.dp, vertical = 16.dp),
@@ -96,7 +96,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Campos de texto con mejor contraste
             val fieldColors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = GreenAccent,
                 focusedLabelColor = GreenAccent,
@@ -109,8 +108,8 @@ fun RegisterScreen(
             )
 
             OutlinedTextField(
-                value = fullName,
-                onValueChange = { fullName = it },
+                value = name,
+                onValueChange = { viewModel.name.value = it },
                 label = { Text("Nombre completo") },
                 placeholder = { Text("Juan Pérez García") },
                 singleLine = true,
@@ -123,7 +122,7 @@ fun RegisterScreen(
 
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = { viewModel.email.value = it },
                 label = { Text("Correo electrónico") },
                 placeholder = { Text("tu@email.com") },
                 singleLine = true,
@@ -136,7 +135,7 @@ fun RegisterScreen(
 
             OutlinedTextField(
                 value = phone,
-                onValueChange = { phone = it },
+                onValueChange = { viewModel.phone.value = it },
                 label = { Text("Teléfono") },
                 placeholder = { Text("987654321") },
                 singleLine = true,
@@ -147,7 +146,6 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // ⚧ Selección de género
             Text("Género", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
             Row(
                 modifier = Modifier
@@ -159,7 +157,7 @@ fun RegisterScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
                             selected = gender == option,
-                            onClick = { gender = option },
+                            onClick = { viewModel.gender.value = option },
                             colors = RadioButtonDefaults.colors(
                                 selectedColor = GreenAccent,
                                 unselectedColor = Color.Gray
@@ -174,7 +172,7 @@ fun RegisterScreen(
 
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { viewModel.password.value = it },
                 label = { Text("Contraseña") },
                 singleLine = true,
                 shape = RoundedCornerShape(50),
@@ -187,7 +185,7 @@ fun RegisterScreen(
 
             OutlinedTextField(
                 value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                onValueChange = { viewModel.confirmPassword.value = it },
                 label = { Text("Confirmar contraseña") },
                 singleLine = true,
                 shape = RoundedCornerShape(50),
@@ -198,40 +196,62 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Mensajes de estado
+            OutlinedTextField(
+                value = age,
+                onValueChange = { viewModel.age.value = it },
+                label = { Text("Edad") },
+                placeholder = { Text("25") },
+                singleLine = true,
+                shape = RoundedCornerShape(50),
+                colors = fieldColors,
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Mostrar mensajes de error o éxito
             errorMessage?.let {
                 Text(it, color = Color.Red, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
-
             successMessage?.let {
-                Text(it, color = Color(0xFF4CAF50), fontSize = 14.sp)
+                Text(it, color = Color.Green, fontSize = 14.sp)
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // Botón principal
             Button(
-                onClick = {
-                    viewModel.registerPatient(
-                        fullName, email, phone, gender, password, confirmPassword
-                    )
-                },
+                onClick = { viewModel.register() },
                 colors = ButtonDefaults.buttonColors(containerColor = GreenAccent),
                 shape = RoundedCornerShape(50),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !isLoading
             ) {
-                Text(
-                    "Crear cuenta",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
+                if (isLoading) {
+                    CircularProgressIndicator(color = Color.White, strokeWidth = 2.dp, modifier = Modifier.size(24.dp))
+                } else {
+                    Text(
+                        "Crear cuenta",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(onClick = { navController.navigate(Routes.Login.route) }) {
                 Text("¿Ya tienes una cuenta? Iniciar sesión", color = BluePrimary, fontSize = 14.sp)
+            }
+        }
+    }
+
+    // Navegar al login si se registró exitosamente
+    if (isRegistered) {
+        LaunchedEffect(Unit) {
+            navController.navigate(Routes.Login.route) {
+                popUpTo(Routes.Register.route) { inclusive = true }
             }
         }
     }

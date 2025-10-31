@@ -4,8 +4,11 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.tecsup.mediturn.data.model.Patient
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 // Instancia de DataStore
@@ -21,14 +24,19 @@ class SessionManager(private val context: Context) {
         private val USER_ID = intPreferencesKey("user_id")
         private val USER_NAME = stringPreferencesKey("user_name")
         private val USER_EMAIL = stringPreferencesKey("user_email")
+        private val ACCESS_TOKEN = stringPreferencesKey("access_token")
+        private val REFRESH_TOKEN = stringPreferencesKey("refresh_token")
+        private val DARK_MODE = booleanPreferencesKey("dark_mode")
     }
 
     // Guarda los datos del usuario actual
-    suspend fun saveUserSession(id: Int, name: String, email: String) {
+    suspend fun saveUserSession(id: Int, name: String, email: String, accesToken: String, refreshToken: String) {
         context.dataStore.edit { prefs ->
             prefs[USER_ID] = id
             prefs[USER_NAME] = name
             prefs[USER_EMAIL] = email
+            prefs[ACCESS_TOKEN] = accesToken
+            prefs[REFRESH_TOKEN] = refreshToken
         }
     }
 
@@ -43,6 +51,28 @@ class SessionManager(private val context: Context) {
     // Limpia la sesión (logout)
     suspend fun clearSession() {
         context.dataStore.edit { it.clear() }
+    }
+
+    suspend fun getAccessToken(): String? {
+        val prefs = context.dataStore.data.first()
+        return prefs[ACCESS_TOKEN]
+    }
+
+    // Actualiza nombre y email almacenados en sesión
+    suspend fun updateBasicInfo(name: String?, email: String?) {
+        context.dataStore.edit { prefs ->
+            if (!name.isNullOrBlank()) prefs[USER_NAME] = name
+            if (!email.isNullOrBlank()) prefs[USER_EMAIL] = email
+        }
+    }
+
+    // Preferencia de modo oscuro
+    val darkModeEnabled: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[DARK_MODE] ?: false
+    }
+
+    suspend fun setDarkMode(enabled: Boolean) {
+        context.dataStore.edit { it[DARK_MODE] = enabled }
     }
 }
 

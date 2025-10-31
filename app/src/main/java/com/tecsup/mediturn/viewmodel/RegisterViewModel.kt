@@ -1,58 +1,108 @@
 package com.tecsup.mediturn.viewmodel
 
+import android.app.Application
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.tecsup.mediturn.data.model.Patient
-import com.tecsup.mediturn.repository.PatientRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.tecsup.mediturn.data.remote.RetrofitInstance
+import com.tecsup.mediturn.data.repository.PatientRepository
 import kotlinx.coroutines.launch
 
-class RegisterViewModel(
-    private val repository: PatientRepository = PatientRepository
-) : ViewModel() {
+class RegisterViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
+    private val patientRepo = PatientRepository(
+        api = RetrofitInstance.patientApi(application)
+    )
 
-    private val _successMessage = MutableStateFlow<String?>(null)
-    val successMessage: StateFlow<String?> = _successMessage
+    var name = mutableStateOf("")
+    var email = mutableStateOf("")
+    var phone = mutableStateOf("")
+    var gender = mutableStateOf("")
+    var age = mutableStateOf("") // Edad como string para TextField
+    var password = mutableStateOf("")
+    var confirmPassword = mutableStateOf("")
 
-    private val _isRegistered = MutableStateFlow(false)
-    val isRegistered: StateFlow<Boolean> = _isRegistered
+    var errorMessage = mutableStateOf<String?>(null)
+    var successMessage = mutableStateOf<String?>(null)
+    var isRegistered = mutableStateOf(false)
+    var isLoading = mutableStateOf(false)
 
-    fun registerPatient(
-        fullName: String,
-        email: String,
-        phone: String,
-        gender: String,
-        password: String,
-        confirmPassword: String
-    ) {
+    fun register() {
+        val nameInput = name.value.trim()
+        val emailInput = email.value.trim()
+        val phoneInput = phone.value.trim()
+        val genderInput = gender.value.trim()
+        val ageInput = age.value.trim()
+        val passwordInput = password.value.trim()
+        val confirmInput = confirmPassword.value.trim()
+
+        // Validación de campos vacíos
+        if (nameInput.isEmpty() || emailInput.isEmpty() || phoneInput.isEmpty() ||
+            genderInput.isEmpty() || ageInput.isEmpty() ||
+            passwordInput.isEmpty() || confirmInput.isEmpty()
+        ) {
+            errorMessage.value = "Por favor completa todos los campos"
+            return
+        }
+
+        // Validación de edad numérica
+        val ageInt = ageInput.toIntOrNull()
+        if (ageInt == null || ageInt <= 0) {
+            errorMessage.value = "Ingresa una edad válida"
+            return
+        }
+
+        // Validación de correo básico
+        if (!emailInput.contains('@') || !Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$").matches(emailInput)) {
+            errorMessage.value = "Ingresa un correo válido"
+            return
+        }
+
+        // Reglas de contraseña segura
+        val pass = passwordInput
+        val hasMinLen = pass.length >= 8
+        val hasUpper = pass.any { it.isUpperCase() }
+        val hasLower = pass.any { it.isLowerCase() }
+        val hasDigit = pass.any { it.isDigit() }
+        val hasSymbol = pass.any { !it.isLetterOrDigit() }
+
+        if (!(hasMinLen && hasUpper && hasLower && hasDigit)) {
+            errorMessage.value = "La contraseña debe tener mínimo 8 caracteres, con mayúscula, minúscula y número"
+            return
+        }
+
+        // Validación de confirmación
+        if (passwordInput != confirmInput) {
+            errorMessage.value = "Las contraseñas no coinciden"
+            return
+        }
+
+        // Llamada al repositorio
         viewModelScope.launch {
-            if (fullName.isBlank() || email.isBlank() || phone.isBlank() ||
-                gender.isBlank() || password.isBlank() || confirmPassword.isBlank()
-            ) {
-                _errorMessage.value = "Por favor completa todos los campos"
-                _successMessage.value = null
-                return@launch
-            }
+            try {
+                isLoading.value = true
+                val success = patientRepo.register(
+                    nameInput,
+                    emailInput,
+                    phoneInput,
+                    genderInput,
+                    passwordInput,
+                    ageInt
+                )
 
-            if (password != confirmPassword) {
-                _errorMessage.value = "Las contraseñas no coinciden"
-                _successMessage.value = null
-                return@launch
-            }
-
-            val success = repository.register(fullName, email, phone, gender, password)
-
-            if (success) {
-                _isRegistered.value = true
-                _successMessage.value = "Cuenta creada con éxito"
-                _errorMessage.value = null
-            } else {
-                _errorMessage.value = "El correo ya está registrado"
-                _successMessage.value = null
+                if (success) {
+                    isRegistered.value = true
+                    successMessage.value = "Cuenta creada con éxito"
+                    errorMessage.value = null
+                } else {
+                    errorMessage.value = "El correo ya está registrado"
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                errorMessage.value = "Error al conectar con el servidor"
+            } finally {
+                isLoading.value = false
             }
         }
     }
