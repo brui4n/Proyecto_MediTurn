@@ -10,9 +10,6 @@ from .views import (
     change_password,
     DoctorScheduleViewSet
 )
-from django.conf import settings
-from django.conf.urls.static import static
-
 # Rutas automáticas generadas por los ViewSets
 router = DefaultRouter()
 router.register(r'doctors', DoctorViewSet)
@@ -31,6 +28,3 @@ urlpatterns = [
 
 
 urlpatterns += router.urls
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

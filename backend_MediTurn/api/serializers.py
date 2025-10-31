@@ -2,9 +2,25 @@ from rest_framework import serializers
 from .models import Doctor, Patient, Slot, Appointment, DoctorRating, DoctorSchedule
 
 class DoctorSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    
     class Meta:
         model = Doctor
         fields = '__all__'
+    
+    def get_image(self, obj):
+        if obj and obj.image:
+            request = self.context.get('request')
+            if request:
+                try:
+                    return request.build_absolute_uri(obj.image.url)
+                except:
+                    return None
+            try:
+                return obj.image.url
+            except:
+                return None
+        return None
 
 class PatientSerializer(serializers.ModelSerializer):
     class Meta:

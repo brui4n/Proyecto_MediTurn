@@ -18,6 +18,11 @@ class DoctorViewSet(viewsets.ModelViewSet):
     serializer_class = DoctorSerializer
     # permission_classes = [IsAuthenticated]
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request
+        return context
+
     def get_queryset(self):
         queryset = Doctor.objects.all()
         specialty = self.request.query_params.get('specialty')
