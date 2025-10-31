@@ -44,12 +44,34 @@ fun DoctorListScreen(
         viewModel.loadDoctorsBySpecialty(specialty)
     }
 
-    // Buscar doctores al escribir
-    LaunchedEffect(searchQuery) {
-        if (searchQuery.isNotBlank()) {
-            viewModel.searchDoctors(searchQuery)
+    // Lista de doctores de la especialidad (sin filtros)
+    val allSpecialtyDoctors = remember(doctorState) {
+        if (doctorState is Resource.Success) {
+            doctorState.data ?: emptyList()
         } else {
-            viewModel.loadDoctorsBySpecialty(specialty)
+            emptyList()
+        }
+    }
+
+    // Filtrar localmente por búsqueda y ciudad
+    val filteredDoctors = remember(allSpecialtyDoctors, searchQuery, selectedCity) {
+        allSpecialtyDoctors.filter { doctor ->
+            // Filtro por búsqueda (solo nombre)
+            val matchesSearch = if (searchQuery.isBlank()) {
+                true
+            } else {
+                val query = searchQuery.lowercase()
+                doctor.name.lowercase().contains(query)
+            }
+            
+            // Filtro por ciudad
+            val matchesCity = if (selectedCity.isNullOrBlank()) {
+                true
+            } else {
+                doctor.city?.equals(selectedCity, ignoreCase = true) == true
+            }
+            
+            matchesSearch && matchesCity
         }
     }
 
@@ -94,7 +116,7 @@ fun DoctorListScreen(
                             tint = Color.Gray
                         )
                     },
-                    placeholder = { Text("Buscar por nombre o especialidad...") },
+                    placeholder = { Text("Buscar por nombre...") },
                     shape = MaterialTheme.shapes.large,
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -125,12 +147,13 @@ fun DoctorListScreen(
                 }
 
                 is Resource.Success -> {
-                    val doctors = doctorState.data ?: emptyList()
-                    val cities = remember(doctors) {
-                        doctors.mapNotNull { it.city?.takeIf { c -> c.isNotBlank() } }.distinct().sorted()
+                    // Ciudades disponibles basadas en todos los doctores de la especialidad
+                    val cities = remember(allSpecialtyDoctors) {
+                        allSpecialtyDoctors.mapNotNull { it.city?.takeIf { c -> c.isNotBlank() } }.distinct().sorted()
                     }
+                    
                     Text(
-                        text = "${doctors.size} médicos encontrados",
+                        text = "${filteredDoctors.size} médicos encontrados",
                         color = Color.Gray,
                         fontSize = 14.sp
                     )
@@ -162,21 +185,33 @@ fun DoctorListScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                     }
 
-                    val visibleDoctors = remember(doctors, selectedCity) {
-                        if (selectedCity.isNullOrBlank()) doctors else doctors.filter { it.city.equals(selectedCity, true) }
-                    }
-
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(14.dp),
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(visibleDoctors) { doctor ->
-                            DoctorCard(
-                                doctor = doctor,
-                                onDetailClick = rememberUpdatedState {
-                                    navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
-                                }.value
+                    if (filteredDoctors.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (searchQuery.isNotBlank() || !selectedCity.isNullOrBlank()) 
+                                    "No se encontraron resultados" 
+                                else 
+                                    "No hay médicos disponibles",
+                                color = Color.Gray,
+                                fontSize = 16.sp
                             )
+                        }
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(filteredDoctors) { doctor ->
+                                DoctorCard(
+                                    doctor = doctor,
+                                    onDetailClick = {
+                                        navController.navigate("${Routes.DoctorDetail.route}/${doctor.id}")
+                                    }
+                                )
+                            }
                         }
                     }
                 }

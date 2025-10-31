@@ -14,3 +14,5 @@
 .cxx
 local.properties
 backend_MediTurn/venv/
+backend_MediTurn/mediturn_backend/__pycache__/
+backend_MediTurn/api/__pycache__/
